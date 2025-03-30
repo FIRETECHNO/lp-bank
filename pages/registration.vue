@@ -10,6 +10,7 @@ const auth = useAuth();
 
 const { meta, handleSubmit, handleReset, validate } = useForm<{
   name: string,
+  surname: string,
   email: string,
   password: string,
 }>({
@@ -20,9 +21,16 @@ const { meta, handleSubmit, handleReset, validate } = useForm<{
   },
   validationSchema: {
     name(value: string) {
-      if (!value || value.length === 0) return 'введите фамилию, имя'
-      if (value.length < 4) return 'слишком короткое имя и фамилия'
-      if (value.length > 22) return 'слишком длинное имя и фамилия'
+      if (!value || value.length === 0) return 'введите имя'
+      if (value.length < 4) return 'слишком короткое имя'
+      if (value.length > 22) return 'слишком длинное имя'
+
+      return true
+    },
+    surname(value: string) {
+      if (!value || value.length === 0) return 'введите фамилию'
+      if (value.length < 4) return 'слишком короткая фамилия'
+      if (value.length > 22) return 'слишком длинная фамилия'
 
       return true
     },
@@ -44,6 +52,7 @@ const { meta, handleSubmit, handleReset, validate } = useForm<{
 })
 
 let name = useField<string>('name')
+let surname = useField<string>('surname')
 let email = useField<string>('email')
 let password = useField<string>('password')
 
@@ -92,11 +101,22 @@ const submit = handleSubmit(async values => {
           @submit="submit"
         >
           <v-text-field 
-            label="Имя Фамилия"
+            label="Имя"
             type="name"
-            placeholder="Иван Иванов"
+            placeholder="Иван"
             v-model="name.value.value"
             :error-messages="name.errors.value"
+            variant="outlined"
+            density="compact"
+            class="w-100"
+          />
+
+          <v-text-field 
+            label="Фамилия"
+            type="surname"
+            placeholder="Иванов"
+            v-model="surname.value.value"
+            :error-messages="surname.errors.value"
             variant="outlined"
             density="compact"
             class="w-100"
