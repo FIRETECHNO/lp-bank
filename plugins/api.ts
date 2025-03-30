@@ -1,32 +1,32 @@
-// import { toast } from 'vue3-toastify'
+import { toast } from 'vue3-toastify';
 
-// export default defineNuxtPlugin(() => {
-//   const config = useRuntimeConfig()
+export default defineNuxtPlugin(() => {
+  const config = useRuntimeConfig();
 
-//   const $apiFetch = $fetch.create({
-//     baseURL: config.public.apiBase,
-//     credentials: 'include',
-//     onRequest({ request, options, error }) {
+  const $apiFetch = $fetch.create({
+    baseURL: config.public.apiBase,
+    credentials: 'include',
+    onRequest({ request, options, error }) {
+      // Логика обработки запроса
+    },
+    onResponse({ response }) {
+      // response._data = new myBusinessResponse(response._data)
+    },
+    onResponseError({ response }) {
+      // if (response._data.message) {
+      //   if (process.client)
+      //     toast(response._data.message, { type: 'error' });
+      // }
+      if (response.status === 401) {
+        useState('authRedirect').value = useRoute().path;
+        navigateTo('/');
+      }
+    },
+  });
 
-//     },
-//     onResponse({ response }) {
-//       // response._data = new myBusinessResponse(response._data)
-//     },
-//     onResponseError({ response }) {
-//       // if (response._data.message) {
-//         // if (process.client)
-//         //   toast(response._data.message, { type: 'error' })
-//       // }
-//       if (response.status === 401) {
-//         useState('authRedirect').value = useRoute().path
-//         navigateTo('/')
-//       }
-//     }
-//   })
-
-//   return {
-//     provide: {
-//       apiFetch: $apiFetch
-//     }
-//   }
-// })
+  return {
+    provide: {
+      apiFetch: $apiFetch,
+    },
+  };
+});

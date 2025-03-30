@@ -50,7 +50,7 @@ export const useAuth = defineStore('auth', () => {
         return true
       }
       const response = await AuthAPI.refresh()
-      
+
       if (response.data.value?._id) {
         user.value = response.data.value
         return true

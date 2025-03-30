@@ -5,7 +5,8 @@ import { useField, useForm } from 'vee-validate'
 
 import _ from 'lodash'
 
-let router = useRouter()
+const router = useRouter()
+const auth = useAuth();
 
 const { meta, handleSubmit, handleReset, validate } = useForm<{
   name: string,
@@ -19,21 +20,21 @@ const { meta, handleSubmit, handleReset, validate } = useForm<{
   },
   validationSchema: {
     name(value: string) {
-      if (value.length === 0) return 'введите фамилию, имя'
+      if (!value || value.length === 0) return 'введите фамилию, имя'
       if (value.length < 4) return 'слишком короткое имя и фамилия'
       if (value.length > 22) return 'слишком длинное имя и фамилия'
 
       return true
     },
     email(value: string) {
-      if (value.length === 0) return 'введите почту'
+      if (!value || value.length === 0) return 'введите почту'
       if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(value))
         return 'неправильно ведено'
 
       return true
     },
     password(value: string) {
-      if (value.length === 0) return 'введите пароль'
+      if (!value || value.length === 0) return 'введите пароль'
       if (value.length < 8) return 'минимум 8 символов'
       if (value.length > 30) return 'слишком длинный пароль'
 
@@ -54,12 +55,13 @@ let loading = ref(false)
 const submit = handleSubmit(async values => {
   loading.value = true
   
-  // await auth.registration(Object.assign(values, {
-  //   roles: ['student', mentor.value ? 'mentor' : null],
-  // }))
-  // .then(() => { 
-  //   if (user.value) router.push(`/user/${user.value._id}`)
-  // })
+  let success = await auth.registration(Object.assign(values, {
+    roles: ["user"],
+  }))
+  
+  if (success) {
+    router.push("/me");
+  }
 
   loading.value = false 
 })
