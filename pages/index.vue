@@ -1,7 +1,7 @@
 <script setup lang="ts">
 </script>
 <template>
-  <div>
+  <v-container>
     index
-  </div>
+  </v-container>
 </template>

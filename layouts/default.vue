@@ -2,7 +2,12 @@
 <template>
   <v-app>
     <v-app-bar app>
-      <v-toolbar-title>My App</v-toolbar-title>
+      <v-btn>logo</v-btn>
+
+      <v-spacer></v-spacer>
+
+      <v-btn icon="mdi-account" to="/me"></v-btn>
+      <v-btn icon="mdi-chat-outline" to="/chats"></v-btn>
     </v-app-bar>
 
     <v-main>
@@ -14,3 +19,4 @@
     </v-footer>
   </v-app>
 </template>
+<style scoped lang="scss"></style>
