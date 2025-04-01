@@ -155,12 +155,20 @@ export const useAuth = defineStore('auth', () => {
     }
   }
 
+  function Equals(other: User): boolean {
+    if (other == null) return false;
+
+    return user.value?.email == other.email &&
+      user.value.name == other.name &&
+      user.value.surname == other.surname;
+  }
+
   return {
     // variables
     user,
     // functions
     registration, login, checkAuth, logout,
     updateUser, sendResetLink, resetPassword, registerStudent,
-    getAllUsers, uploadAvatar,
+    getAllUsers, uploadAvatar, Equals
   }
 })
