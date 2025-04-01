@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: ["auth"]
+})
+
 import { io } from 'socket.io-client';
 
 

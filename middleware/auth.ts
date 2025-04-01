@@ -4,7 +4,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
   if (!isAuth) {
     abortNavigation();
-    // navigate to login page, now it's on /
-    return navigateTo('/')
+    // navigate to login page
+    return navigateTo('/login')
   }
 })
