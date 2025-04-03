@@ -54,22 +54,30 @@ onBeforeUnmount(() => {
 </script>
 <template>
   <v-container>
-    <div class="chat-container">
-      <div class="room-selector">
-        <button v-for="room in rooms" :key="room" @click="joinRoom(room)">
-          {{ room }}
-        </button>
-      </div>
+    <v-row class="d-flex justify-center">
+      <v-col cols="12" md="11" xl="10">
+        <v-row>
+          <v-col cols="12">
+            <div class="chat-container">
+              <div class="room-selector">
+                <button v-for="room in rooms" :key="room" @click="joinRoom(room)">
+                  {{ room }}
+                </button>
+              </div>
 
-      <div class="messages">
-        messages
-        <div v-for="(msg, index) in messages" :key="index" class="message">
-          <strong>{{ msg.sender }}:</strong> {{ msg.message }}
-        </div>
-      </div>
+              <div class="messages">
+                messages
+                <div v-for="(msg, index) in messages" :key="index" class="message">
+                  <strong>{{ msg.sender }}:</strong> {{ msg.message }}
+                </div>
+              </div>
 
-      <input v-model="newMessage" @keyup.enter="sendMessage" type="text" placeholder="Type a message" />
-    </div>
+              <input v-model="newMessage" @keyup.enter="sendMessage" type="text" placeholder="Type a message" />
+            </div>
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 

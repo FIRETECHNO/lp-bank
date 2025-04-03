@@ -1,0 +1,41 @@
+<script setup lang="ts">
+import type { User } from '~/types/user.interface';
+
+const matchStore = useMatching();
+
+let { candidates } = storeToRefs(matchStore);
+
+await matchStore.getMatches();
+
+let currentMatch = ref<User | null>();
+
+
+function nextMatch() {
+  currentMatch.value = matchStore.getCurrentMatch();
+}
+
+function processLike() {
+  nextMatch()
+}
+
+function processDislike() {
+  nextMatch()
+}
+
+onMounted(() => {
+  nextMatch()
+})
+</script>
+<template>
+  <v-container>
+    <v-row class="d-flex justify-center">
+      <v-col cols="12" md="11" xl="10">
+        <v-row class="d-flex justify-center align-center">
+          <v-col cols="12" md="8" lg="6" style="min-height: 60vh;">
+            <CandidateCard :candidate="currentMatch" @like="processLike" @dislike="processDislike" />
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
