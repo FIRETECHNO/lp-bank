@@ -14,7 +14,10 @@ function nextMatch() {
   currentMatch.value = matchStore.getCurrentMatch();
 }
 
-function processLike() {
+async function processLike() {
+  if (!currentMatch.value?._id) return;
+
+  let response = await matchStore.processLike(currentMatch.value?._id);
   nextMatch()
 }
 

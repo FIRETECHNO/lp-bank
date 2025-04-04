@@ -25,7 +25,7 @@ export const useMatching = defineStore('matching', () => {
   }
 
   function getCurrentMatch(): User | null {
-    console.log(candidates.value.length);
+    console.log("Количество candidates: ", candidates.value.length);
 
     if (candidates.value.length > 0) {
       return candidates.value.shift();
@@ -33,11 +33,24 @@ export const useMatching = defineStore('matching', () => {
     return null;
   }
 
+  async function processLike(likedUserId: string) {
+    const userStore = useAuth();
+
+    if (!userStore.user?._id) return;
+
+    let response = await MatchApi.processLike(likedUserId, userStore.user?._id);
+
+    if (response.status.value == "success") {
+      return true
+    }
+    return false;
+  }
+
 
   return {
     // variables
     candidates, sentRequests,
     // functions
-    getMatches, getCurrentMatch,
+    getMatches, getCurrentMatch, processLike,
   }
 })
