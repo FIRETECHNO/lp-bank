@@ -3,12 +3,7 @@ import type { User } from '~/types/user.interface';
 
 const matchStore = useMatching();
 
-let { candidates } = storeToRefs(matchStore);
-
-await matchStore.getMatches();
-
 let currentMatch = ref<User | null>();
-
 
 function nextMatch() {
   currentMatch.value = matchStore.getCurrentMatch();
@@ -25,7 +20,8 @@ function processDislike() {
   nextMatch()
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await matchStore.getMatches();
   nextMatch()
 })
 </script>

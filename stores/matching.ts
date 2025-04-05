@@ -9,8 +9,6 @@ export const useMatching = defineStore('matching', () => {
   let sentRequests = ref<any[]>([]);
 
   async function getMatches(): Promise<User[]> {
-    if (process.client) return candidates.value;
-
     let response = await MatchApi.getMatches();
 
     if (response.data.value?.length > 0) {

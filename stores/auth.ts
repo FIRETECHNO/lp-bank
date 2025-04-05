@@ -3,6 +3,7 @@ import AuthAPI from "../api/AuthApi"
 
 import type { User } from "../types/user.interface"
 import { ref } from "vue"
+import MatchApi from "~/api/MatchApi"
 
 export const useAuth = defineStore('auth', () => {
   let user = ref<User | null>()
@@ -163,12 +164,22 @@ export const useAuth = defineStore('auth', () => {
       user.value.surname == other.surname;
   }
 
+  async function populateMatches() {
+    if (!user.value?._id) return;
+
+    let response = await MatchApi.populateMatches(user.value?._id);
+
+    if (response.status.value == 'success') {
+      user.value.matches = response.data.value?.matches;
+    }
+  }
+
   return {
     // variables
     user,
     // functions
     registration, login, checkAuth, logout,
     updateUser, sendResetLink, resetPassword, registerStudent,
-    getAllUsers, uploadAvatar, Equals
+    getAllUsers, uploadAvatar, Equals, populateMatches,
   }
 })

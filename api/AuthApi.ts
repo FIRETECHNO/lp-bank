@@ -23,7 +23,7 @@ export default {
       body: { email }
     })
   },
-  resetPassword(password: string, userId: string, token: string) {    
+  resetPassword(password: string, userId: string, token: string) {
     return useApiFetch('/auth/reset-password', {
       method: 'POST',
       body: { password, userId, token }
@@ -36,5 +36,5 @@ export default {
   },
   uploadAvatar(formData: FormData, userId: string) {
     return useApiFetch(`/auth/upload-avatar?user_id=${userId}`, { method: 'POST', headers: { 'Content-Type': 'multipart/form-data' }, body: formData })
-  }
+  },
 }
