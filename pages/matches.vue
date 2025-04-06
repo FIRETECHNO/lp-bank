@@ -26,8 +26,8 @@ function rejectMatch(match: any) {
 
   closeAcceptMatchDialog()
 }
-function acceptMatch(match: any) {
-  matchStore.acceptMatch(match._id, match.sender._id, match.receiver._id);
+async function acceptMatch(match: any) {
+  await matchStore.acceptMatch(match._id, match.sender._id, match.receiver._id);
 
   closeAcceptMatchDialog()
 }
