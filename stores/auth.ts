@@ -2,11 +2,38 @@ import { defineStore } from "pinia"
 import AuthAPI from "../api/AuthApi"
 
 import type { User } from "../types/user.interface"
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import MatchApi from "~/api/MatchApi"
 
 export const useAuth = defineStore('auth', () => {
   let user = ref<User | null>()
+
+  let receivedMatches = computed(() => {
+    // if matches are not populated or not presented
+    if (typeof (user.value?.matches[0]) == "string" || !user.value?.matches) return []
+    let result = [];
+
+    for (let match of user.value.matches) {
+      if (match.receiver._id === user.value._id) {
+        result.push(match)
+      }
+    }
+
+    return result;
+  })
+
+  let sentMatches = computed(() => {
+    // if matches are not populated or not presented
+    if (typeof (user.value?.matches[0]) == "string" || !user.value?.matches) return []
+    let result = [];
+    for (let match of user.value.matches) {
+      if (match.sender._id === user.value._id) {
+        result.push(match)
+      }
+    }
+
+    return result;
+  })
 
   async function registration(data: any): Promise<boolean> {
     try {
@@ -176,7 +203,7 @@ export const useAuth = defineStore('auth', () => {
 
   return {
     // variables
-    user,
+    user, receivedMatches, sentMatches,
     // functions
     registration, login, checkAuth, logout,
     updateUser, sendResetLink, resetPassword, registerStudent,

@@ -5,12 +5,7 @@ definePageMeta({
 
 import { io } from 'socket.io-client';
 
-
 import { useRuntimeConfig } from '#app';
-
-const userStore = useAuth();
-
-let { user } = storeToRefs(userStore)
 
 const config = useRuntimeConfig();
 const chatStore = useChat();
@@ -40,11 +35,7 @@ const sendMessage = () => {
   }
 };
 
-
-
-await userStore.populateMatches();
 onMounted(async () => {
-
   socket.value = io(config.public.apiBase); // Подключаемся к серверу WebSocket
 
   socket.value.on('message', (data: any) => {
@@ -65,11 +56,6 @@ onBeforeUnmount(() => {
     <v-row class="d-flex justify-center">
       <v-col cols="12" md="11" xl="10">
         <v-row>
-          <v-col cols="12">
-            <h1>Заявки</h1>
-            {{ user?.matches }}
-          </v-col>
-
           <v-col cols="12">
             <div class="chat-container">
               <div class="room-selector">
