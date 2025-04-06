@@ -18,9 +18,9 @@ export default defineNuxtPlugin((nuxtApp) => {
 			},
 		},
 		defaults: {
-			VBtn: {
-				style: 'text-transform: none; letter-spacing: normal',
-			},
+			// VBtn: {
+			// 	style: 'text-transform: none; letter-spacing: normal',
+			// },
 			global: {
 				ripple: false,
 			},

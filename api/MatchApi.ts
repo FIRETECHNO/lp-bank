@@ -7,5 +7,15 @@ export default {
   },
   populateMatches(userId: string): Promise<any> {
     return useApiFetch(`/matching/populate-matches?user_id=${userId}`, { method: "GET" })
-  }
+  },
+  acceptMatch(matchId: string, senderId: string, receiverId: string) {
+    return useApiFetch('/matching/accept-match', {
+      method: "POST",
+      body: {
+        matchId,
+        senderId,
+        receiverId
+      }
+    })
+  },
 }

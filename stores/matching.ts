@@ -44,11 +44,16 @@ export const useMatching = defineStore('matching', () => {
     return false;
   }
 
+  async function acceptMatch(matchId: string, senderId: string, receiverId: string) {
+    if (!matchId || !senderId || !receiverId) return;
+
+    let response = await MatchApi.acceptMatch(matchId, senderId, receiverId);
+  }
 
   return {
     // variables
     candidates, sentRequests,
     // functions
-    getMatches, getCurrentMatch, processLike,
+    getMatches, getCurrentMatch, processLike, acceptMatch,
   }
 })
