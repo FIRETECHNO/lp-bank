@@ -12,9 +12,11 @@ interface ChatMessage {
   // _id?: string; // ID может приходить позже или при загрузке истории
 }
 
-const config = useRuntimeConfig()
+
 
 export function useChatSocket(roomId: string) {
+  const config = useRuntimeConfig()
+
   const messages = ref<ChatMessage[]>([]);
   const isConnected = ref(false);
   let socket: Socket | null = null;
@@ -79,11 +81,13 @@ export function useChatSocket(roomId: string) {
     }
   };
 
-  const sendMessage = (content: string) => {
+  const sendMessage = (content: string, user: string, userName: string) => {
     if (socket && isConnected.value && content.trim()) {
       const messagePayload = {
         roomId: roomId,
         content: content.trim(),
+        user: user,
+        userName: userName,
         // Можно добавить временный ID для отслеживания подтверждения
         // tempId: Date.now().toString()
       };

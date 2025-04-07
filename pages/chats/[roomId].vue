@@ -5,6 +5,7 @@ definePageMeta({
 
 const route = useRoute();
 const roomId = ref(route.params.roomId as string); // Получаем ID комнаты из URL
+const userStore = useAuth();
 
 // Используем composable
 const { messages, isConnected, sendMessage } = useChatSocket(roomId.value);
@@ -12,7 +13,10 @@ const { messages, isConnected, sendMessage } = useChatSocket(roomId.value);
 const newMessage = ref('');
 
 const handleSend = () => {
-  sendMessage(newMessage.value);
+  if (!userStore.user?._id) return;
+  const userName = userStore.user.name + " " + userStore.user.surname;
+
+  sendMessage(newMessage.value, userStore.user._id, userName);
   newMessage.value = ''; // Очищаем поле ввода
 };
 
