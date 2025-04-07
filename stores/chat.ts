@@ -1,25 +1,29 @@
 import { defineStore } from "pinia"
 
+import ChatApi from "~/api/ChatApi";
+
 import { ref } from "vue";
 
 export const useChat = defineStore('chat', () => {
-  let messages = ref<any[]>([])
-  let currentRoom = ref<any>(null);
+  let chats = ref<any[]>([])
 
-  function addMessage(message: any) {
-    messages.value.push(message);
-  }
-  function setRoom(room: any) {
-    currentRoom.value = room;
-  }
-  function clearMessages() {
-    messages.value = [];
+
+  async function getUserChats() {
+    const { user } = useAuth();
+
+    if (!user?._id) return;
+
+    let response = await ChatApi.getUserChats(user._id);
+
+    if (response.status.value == "success") {
+      chats.value = response.data.value;
+    }
   }
 
   return {
     // variables
-    messages, currentRoom,
+    chats,
     // functions
-    addMessage, setRoom, clearMessages
+    getUserChats,
   }
 })

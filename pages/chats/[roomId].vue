@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: ["auth"]
+})
+
 const route = useRoute();
 const roomId = ref(route.params.roomId as string); // Получаем ID комнаты из URL
 
