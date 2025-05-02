@@ -194,10 +194,10 @@ export const useAuth = defineStore('auth', () => {
   async function populateMatches() {
     if (!user.value?._id) return;
 
-    let response = await MatchApi.populateMatches(user.value?._id);
+    let result = await MatchApi.populateMatches(user.value?._id);
 
-    if (response.status.value == 'success') {
-      user.value.matches = response.data.value?.matches;
+    if (result != null) {
+      user.value.matches = result.matches;
     }
   }
 

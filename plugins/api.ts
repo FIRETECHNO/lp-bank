@@ -10,18 +10,34 @@ export default defineNuxtPlugin(() => {
       // Логика обработки запроса
     },
     onResponse({ response }) {
-      // response._data = new myBusinessResponse(response._data)
+
     },
+
     onResponseError({ response }) {
-      if (response._data.message) {
-        if (process.client)
-          toast(response._data?.message || "Ошибка", { type: 'error', autoClose: 1000 });
+      console.error(`[onResponseError] Status: ${response.status}, Client: ${process.client}`); // Log status and environment
+      console.error('[onResponseError] Data:', JSON.stringify(response._data)); // Log the actual data
+
+      // Adjust this check based on your actual error structure
+      if (response?._data?.message) {
+        if (process.client) {
+          console.log('[onResponseError] Showing toast for:', response._data.message);
+          toast(response._data.message || "Ошибка", { type: 'error', autoClose: 1000 });
+        } else {
+          console.log('[onResponseError] Skipping toast on server.');
+        }
       }
       if (response.status === 401) {
         useState('authRedirect').value = useRoute().path;
-        navigateTo('/');
+        navigateTo('/login');
       }
     },
+    // onResponseError({ response }) {
+    //   if (response._data.message) {
+    //     if (process.client)
+    //       toast(response._data?.message || "Ошибка", { type: 'error', autoClose: 1000 });
+    //   }
+
+    // },
   });
 
   return {
