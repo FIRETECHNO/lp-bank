@@ -1,76 +1,86 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'; // Добавлен computed
+import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { useAuth } from '@/stores/auth'; // Убедитесь, что путь к вашему store верный
-import { useChatSocket } from '@/composables/useChatSocket'; // Убедитесь, что путь к composable верный
+import { useAuth } from '@/stores/auth'; // Adjust path if needed
 
 definePageMeta({
-  middleware: ["auth"] // middleware Nuxt 3
+  middleware: ["auth"]
 });
 
 const route = useRoute();
 const userStore = useAuth();
-
-// --- Получение Room ID ---
-// Делаем roomId вычисляемым свойством на случай, если параметр маршрута может измениться
-// без полной перезагрузки страницы (хотя обычно для чата это не так)
 const roomId = computed(() => route.params.roomId as string);
 
-// --- Использование Composable ---
-// Деструктурируем ВСЕ нужные значения из useChatSocket
 const {
-  messages,          // Массив сообщений (реактивный)
-  isConnected,       // Статус подключения WebSocket (реактивный)
-  isConnecting,      // Статус попытки подключения WebSocket (реактивный)
-  isLoadingHistory,  // Статус загрузки истории (реактивный)
-  historyError,      // Ошибка загрузки истории (реактивный)
-  sendMessage,       // Функция отправки сообщения
-  fetchHistory,      // Функция для повторной загрузки истории
-  // connect,        // Можно получить, если нужна кнопка ручного подключения
-  // disconnect,     // Можно получить, если нужна кнопка ручного отключения
-} = useChatSocket(roomId.value); // Передаем ID комнаты
+  messages,
+  isConnected,
+  isConnecting,
+  isLoadingHistory,
+  historyError,
+  sendMessage,
+  fetchHistory,
+} = useChatSocket(roomId.value);
 
-// --- Состояние для нового сообщения ---
 const newMessage = ref('');
 
-// --- Отправка сообщения ---
 const handleSend = () => {
-  // Проверка наличия пользователя и его ID
   if (!userStore.user?._id) {
     console.error("User ID not available for sending message.");
     return;
   }
-  // Получаем имя пользователя (если есть)
-  const userName = userStore.user.name || userStore.user.email || 'Anonymous'; // Используем имя или username
-
-  // Вызываем sendMessage из composable
+  const userName = userStore.user.name || userStore.user.email || 'Error user';
   sendMessage(newMessage.value, userStore.user._id, userName);
-  newMessage.value = ''; // Очищаем поле ввода
+  newMessage.value = '';
 };
 
-// --- Форматирование времени ---
-// Обновлено для работы с createdAt (обычно строка ISO 8601)
 const formatTimestamp = (timestamp?: string): string => {
   if (!timestamp) return '';
   try {
-    // Используем toLocaleString для более полной информации (дата + время)
-    // или toLocaleTimeString для только времени
     return new Date(timestamp).toLocaleString();
-    // return new Date(timestamp).toLocaleTimeString();
   } catch (e) {
     console.error("Error formatting timestamp:", e);
-    return 'Invalid date'; // Возвращаем что-то осмысленное при ошибке
+    return 'Invalid date';
   }
 };
 
-// --- Получение имени отправителя ---
-// Хелпер для извлечения имени из объекта senderId
-const getSenderName = (msg: typeof messages.value[0]): string => {
-  if (!msg.senderId) return 'System'; // Если отправителя нет (системное сообщение?)
-  if (typeof msg.senderId === 'string') return 'Unknown User'; // Если ID не был развернут (маловероятно с populate)
-  // Пытаемся получить имя или username из объекта senderId
-  return msg.senderId.name || msg.senderId.username || `User (${msg.senderId._id.slice(-4)})`; // Показываем часть ID, если нет имени
-}
+const getSenderName = (msg: ChatMessage): string => {
+  const sender = msg.senderId; // Use the message senderId
+
+  // 1. Handle explicitly missing senderId (likely data loading issue, not "System")
+  if (!sender) {
+    // Log this to understand why it happens (SSR data issue?)
+    // console.warn(`Message ${msg._id} is missing senderId during render.`);
+    return 'Пользователь...'; // Or "Loading Name..." - less confusing than "System"
+  }
+
+  // 2. Handle case where population failed and it's just an ID string
+  if (typeof sender === 'string') {
+    // Check if this ID matches the current logged-in user
+    if (sender === userStore.user?._id) {
+      return 'Вы'; // Or use userStore.user.name if available
+    }
+    return `User (${sender.slice(-4)})`; // Fallback using partial ID
+  }
+
+  // 3. Handle successfully populated sender object
+  // Check if this sender matches the current logged-in user
+  if (sender._id === userStore.user?._id) {
+    return 'You'; // Display "You" for messages sent by the current user
+  }
+  // Otherwise, use the populated name or username
+  return sender.name || sender.username || `Пользователь (${sender._id.slice(-4)})`; // Fallback using partial ID
+};
+
+// --- Helper to check if the message is from the current user ---
+const isMyMessage = (msg: any): boolean => {
+  const sender = msg.senderId;
+  if (!sender || !userStore.user?._id) {
+    return false;
+  }
+  // Check based on ID, whether senderId is string or object
+  const senderIdVal = typeof sender === 'string' ? sender : sender._id;
+  return senderIdVal === userStore.user._id;
+};
 
 </script>
 
@@ -78,8 +88,9 @@ const getSenderName = (msg: typeof messages.value[0]): string => {
   <div class="chat-container">
     <h1>Чат комнаты: {{ roomId }}</h1>
 
-    <!-- === Статус подключения === -->
+    <!-- Status indicators -->
     <div class="status-container">
+      <!-- ... status divs ... -->
       <div v-if="isConnecting" class="status connecting">
         Статус: Подключение...
       </div>
@@ -94,35 +105,35 @@ const getSenderName = (msg: typeof messages.value[0]): string => {
       </div>
     </div>
 
-    <!-- === Загрузка и Ошибки Истории === -->
+    <!-- Loading / Error States -->
     <div v-if="isLoadingHistory" class="loading-indicator">
       Загрузка истории сообщений...
     </div>
     <div v-if="historyError" class="error-message">
       <p>Не удалось загрузить историю сообщений:</p>
-      <pre>{{ historyError.message || historyError }}</pre>
+      <!-- Make sure error display is safe -->
+      <pre>{{ historyError instanceof Error ? historyError.message : JSON.stringify(historyError) }}</pre>
       <button @click="fetchHistory()">Попробовать снова</button>
     </div>
 
-    <!-- === Список Сообщений === -->
-    <!-- Показываем только если нет ошибки и загрузка завершена -->
+    <!-- Message List -->
+    <!-- Use v-else with isLoadingHistory for clarity -->
     <div v-else class="message-list">
       <div v-if="!messages.length" class="no-messages">
         Сообщений пока нет.
       </div>
-      <div v-for="msg in messages" :key="msg._id" class="message"
-        :class="{ 'my-message': msg.senderId && typeof msg.senderId !== 'string' && msg.senderId._id === userStore.user?._id }">
-        <!-- Используем getSenderName и createdAt -->
+      <!-- Use the isMyMessage helper for class binding -->
+      <div v-for="msg in messages" :key="msg._id" class="message" :class="{ 'my-message': isMyMessage(msg) }">
+        <!-- Use getSenderName and createdAt -->
         <strong>{{ getSenderName(msg) }}:</strong>
         <span>{{ msg.content }}</span>
         <em class="timestamp">{{ formatTimestamp(msg.createdAt) }}</em>
       </div>
-      <!-- Элемент для автопрокрутки (нужна доп. логика) -->
-      <!-- <div ref="endOfMessages"></div> -->
     </div>
 
-    <!-- === Форма Отправки === -->
+    <!-- Message Form -->
     <form @submit.prevent="handleSend" class="message-form">
+      <!-- ... form elements ... -->
       <input type="text" v-model="newMessage" placeholder="Введите сообщение..."
         :disabled="!isConnected || isConnecting" aria-label="Новое сообщение" />
       <button type="submit" :disabled="!isConnected || isConnecting || !newMessage.trim()">

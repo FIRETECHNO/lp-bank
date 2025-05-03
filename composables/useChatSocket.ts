@@ -3,18 +3,12 @@ import { io, Socket } from 'socket.io-client';
 // Removed direct import of useFetch and FetchError if useApiFetch handles it internally
 import { useRuntimeConfig /*, type FetchError */ } from '#app'; // Keep FetchError if you still need the type
 
-// --- ChatMessage Interface (ensure it matches server response) ---
-interface ChatMessage {
-  _id: string;
+// DTO для исходящего сообщения от клиента
+interface SendMessageDto {
   roomId: string;
-  senderId: {
-    _id: string;
-    name?: string;
-    username?: string;
-  } | string;
+  senderId: string;
+  senderName: string;
   content: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export function useChatSocket(roomId: string, initialLimit: number = 50) {
@@ -27,22 +21,12 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
   let socket: Socket | null = null;
 
   // --- Fetching Message History with useApiFetch ---
-
-  // History URL endpoint (relative path might be sufficient if $apiFetch handles base URL)
-  // Check if your $apiFetch prepend the base URL automatically
-  // If yes: const historyEndpoint = computed(() => `/api/messages`);
-  // If no: const historyEndpoint = computed(() => `${backendUrl}/api/messages`);
-  // Let's assume $apiFetch DOES handle the base URL for now:
-  const historyEndpoint = computed(() => `/messages/`);
-
-
-  // *** Use useApiFetch instead of useFetch ***
   const {
     data: historyData,
     pending: isLoadingHistory,
     error: historyError, // Type might implicitly come from useApiFetch or use FetchError
     execute: fetchHistory,
-  } = useApiFetch<ChatMessage[]>(historyEndpoint.value, { // <-- Call useApiFetch
+  } = useApiFetch<ChatMessage[]>("/messages/", {
     // Pass options needed for the fetch
     query: { // Pass query parameters here
       roomId: roomId,
@@ -57,13 +41,11 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
   // Watcher remains the same
   watch(historyData, (newHistory) => {
     if (newHistory) {
-      console.log(`Received ${newHistory.length} historical messages for room ${roomId} via useApiFetch.`);
+      console.log(`Received ${newHistory.length} historical messages for room ${roomId}.`);
       messages.value = [...newHistory];
     }
   }, { immediate: true });
 
-
-  // --- WebSocket Connection Logic (remains largely the same) ---
 
   const connect = async () => {
     if (socket || isConnecting.value) {
@@ -77,22 +59,19 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
 
     // 1. Fetch history first using the execute function from useApiFetch
     try {
-      // Construct the full URL just for logging if needed, fetch uses the endpoint/query
-      const logUrl = `${backendUrl}${historyEndpoint.value}?roomId=${roomId}&limit=${initialLimit}`;
-      console.log(`Fetching message history via useApiFetch from endpoint: ${historyEndpoint.value} (query: roomId=${roomId}, limit=${initialLimit}). Full URL approx: ${logUrl}`);
-      await fetchHistory(); // Execute the fetch defined by useApiFetch
+      await fetchHistory();
+
       if (historyError.value) {
-        console.error('Error fetching message history via useApiFetch:', historyError.value);
+        console.error('Error while fetching message history:', historyError.value);
       } else {
-        console.log('Message history fetch via useApiFetch successful (or data already present).');
+        console.log('Message history fetch successful (or data already present).');
       }
     } catch (err) {
-      console.error('Exception during fetchHistory (useApiFetch) execution:', err);
-      // historyError.value = err as FetchError; // Assign if needed and type is available
+      console.error('Exception during fetchHistory execution:', err);
     }
 
-    // 2. Connect WebSocket (no changes here)
-    console.log(`Connecting WebSocket to ${backendUrl}...`);
+    // 2. Connect WebSocket
+    console.log(`Connecting WebSocket to room ${roomId}...`);
     if (socket) {
       cleanupSocketListeners();
     }
@@ -103,9 +82,6 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
     });
     setupSocketListeners();
   };
-
-  // setupSocketListeners, cleanupSocketListeners, disconnect, sendMessage
-  // remain identical to the previous version...
 
   const setupSocketListeners = () => {
     if (!socket) return;
@@ -120,7 +96,7 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
     socket.on('disconnect', (reason) => {
       isConnected.value = false;
       isConnecting.value = false;
-      console.log('WebSocket disconnected:', reason);
+      console.log('WebSocket disconnected: ', reason);
     });
 
     socket.on('connect_error', (err) => {
@@ -129,16 +105,68 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
       isConnecting.value = false;
     });
 
-    socket.on('newMessage', (message: ChatMessage) => {
-      if (message && message.roomId === roomId) {
-        console.log('New message received via WebSocket:', message);
-        if (!messages.value.some(m => m._id === message._id)) {
-          messages.value.push(message);
+    // socket.on('newMessage', (message: ChatMessage | SendMessageDto) => {
+    //   if (message?._id && message.roomId === roomId) {
+    //     console.log('New message received via WebSocket:', message);
+    //     if (!messages.value.some(m => m._id === message._id)) {
+    //       messages.value.push(message);
+    //     } else {
+    //       console.log('Duplicate message ignored:', message._id);
+    //     }
+    //   }
+    // });
+
+    // --- Modified newMessage Listener with Union Type and Guard ---
+    socket.on('newMessage', (message: ChatMessage | SendMessageDto) => { // Explicit Union Type
+      console.log('>>> newMessage event received on client:', message);
+
+      // Basic validation: Should be handled by TS union type, but extra check is safe
+      if (!message || typeof message !== 'object') {
+        console.warn('Received invalid data type via WebSocket:', message);
+        return;
+      }
+
+      // --- TYPE GUARD: Check for the definitive property of ChatMessage ---
+      if ('_id' in message) {
+        // It has an _id, so it MUST be a ChatMessage according to our types
+        // No need to cast explicitly if TS understands the guard, but can add for clarity:
+        const chatMsg = message as ChatMessage;
+
+        console.log('   Received ChatMessage (has _id):', chatMsg);
+
+        if (chatMsg.roomId === roomId) {
+          console.log(`   Room ID matches. Checking for duplicates (ID: ${chatMsg._id}).`);
+          const isDuplicate = messages.value.some(m => m._id === chatMsg._id);
+          console.log(`   Is duplicate? ${isDuplicate}`);
+
+          if (!isDuplicate) {
+            console.log('   Adding ChatMessage to messages ref...');
+            messages.value.push(chatMsg);
+          } else {
+            console.log('   Duplicate ChatMessage ignored:', chatMsg._id);
+          }
         } else {
-          console.log('Duplicate message ignored:', message._id);
+          console.log('   ChatMessage ignored, wrong room ID.');
+        }
+      }
+      // --- Handle the SendMessageDto case ---
+      else {
+        // If it doesn't have '_id', it MUST be SendMessageDto according to the union type
+        // No need to cast explicitly if TS understands the guard, but can add for clarity:
+        const dtoMsg = message as SendMessageDto;
+
+        console.warn('   Received SendMessageDto (no _id):', dtoMsg);
+
+        // Only proceed if the room matches, otherwise ignore
+        if (dtoMsg.roomId === roomId) {
+          console.warn('   >> This SendMessageDto is currently being ignored as it lacks required fields (_id, createdAt, etc.) for the messages array.');
+          // Decide action: Ignore (current), or implement complex optimistic update.
+        } else {
+          console.log('   SendMessageDto ignored, wrong room ID.');
         }
       }
     });
+
 
     socket.on('joinedRoom', (confirmationRoomId: string) => {
       console.log(`Successfully joined room: ${confirmationRoomId}`);
@@ -172,7 +200,7 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
     isConnecting.value = false;
   };
 
-  const sendMessage = (content: string, user /* userId */: string, userName?: string) => {
+  const sendMessage = (content: string, senderId: string, senderName: string) => {
     if (!socket || !isConnected.value) {
       console.warn('Cannot send message: WebSocket not connected.');
       return;
@@ -181,14 +209,13 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
       console.warn('Cannot send empty message.');
       return;
     }
-    const messagePayload = {
+    const messagePayload: SendMessageDto = {
       roomId: roomId,
       content: content.trim(),
-      user: user,
-      userName: userName,
-      // Можно добавить временный ID для отслеживания подтверждения
-      // tempId: Date.now().toString()
+      senderId: senderId,
+      senderName: senderName,
     };
+
     console.log('Sending message:', messagePayload);
     socket.emit('sendMessage', messagePayload, (ack: any) => {
       if (ack?.error) {
