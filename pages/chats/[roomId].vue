@@ -9,7 +9,11 @@ definePageMeta({
 
 const route = useRoute();
 const userStore = useAuth();
+const chatStore = useChat();
 const roomId = computed(() => route.params.roomId as string);
+const chatId = route.query.chat_id as string
+
+const currentChat = await chatStore.getCurrentChat(chatId);
 
 const {
   messages, // This is now ref<DisplayMessage[]>
@@ -67,26 +71,23 @@ watch(messages, async () => {
   }
 }, { deep: true }); // deep watch needed as objects inside array change
 
+
 </script>
 
 <template>
   <div class="chat-container">
-    <h1>Чат комнаты: {{ roomId }}</h1>
+    <h1 v-if="currentChat.receiver">{{ currentChat.receiver.name }} {{ currentChat.receiver.surname }}</h1>
 
     <!-- Status indicators -->
     <div class="status-container">
       <!-- ... status divs ... -->
       <div v-if="isConnecting" class="status connecting">
-        Статус: Подключение...
       </div>
       <div v-else-if="isConnected" class="status connected">
-        Статус: Подключено
       </div>
       <div v-else-if="historyError" class="status disconnected">
-        Статус: Ошибка (см. ниже)
       </div>
       <div v-else class="status disconnected">
-        Статус: Отключено
       </div>
     </div>
 

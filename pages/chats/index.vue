@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { toast } from 'vue3-toastify';
+
 definePageMeta({
   middleware: ["auth"]
 })
@@ -8,7 +10,14 @@ const router = useRouter()
 let { chats } = storeToRefs(chatStore)
 
 function joinRoom(chatId: string) {
-  router.push(`/chats/${chatId}`)
+  let isSelected = chatStore.selectChat(chatId);
+  if (isSelected) {
+    router.push(`/chats/${chatId}?chat_id=${chatId}`)
+  } else {
+    toast("Ошибка при входе в чат!", {
+      type: "error"
+    })
+  }
 }
 
 await chatStore.getUserChats();
