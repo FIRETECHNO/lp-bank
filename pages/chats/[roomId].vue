@@ -108,7 +108,7 @@ watch(messages, async () => {
         Сообщений пока нет.
       </div>
       <!-- Use the isMyMessage helper for class binding -->
-      <div v-for="msg in messages" :key="msg._id" class="message" :class="{ 'my-message': isMyMessage(msg) }">
+      <div v-for="msg in messages" :key="msg?._id" class="message" :class="{ 'my-message': isMyMessage(msg) }">
         <!-- Use getSenderName and createdAt -->
         <strong>{{ getSenderName(msg) }}:</strong>
         <span>{{ msg.content }}</span>

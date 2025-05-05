@@ -56,8 +56,8 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
     if (newHistory) {
       console.log(`WATCH historyData: Received ${newHistory.length} historical DisplayMessages.`);
       // Find messages that are currently pending and might be replaced by history
-      const pendingIds = messages.value.filter(m => m.isPending).map(m => m.id);
-      const nonPendingHistory = newHistory.filter(histMsg => !pendingIds.includes(histMsg.id)); // Avoid adding duplicates if pending msg ID matches _id somehow
+      const pendingIds = messages.value.filter(m => m.isPending).map(m => m._id);
+      const nonPendingHistory = newHistory.filter(histMsg => !pendingIds.includes(histMsg._id)); // Avoid adding duplicates if pending msg ID matches _id somehow
 
       messages.value = [...nonPendingHistory]; // Replace with fetched history
       console.log(`Messages ref length after history update: ${messages.value.length}`);
@@ -81,7 +81,7 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
     }
 
     return {
-      id: chatMsg._id,
+      _id: chatMsg._id,
       roomId: chatMsg.roomId,
       senderId: senderObj,
       senderName: derivedSenderName, // Use derived name
@@ -94,7 +94,7 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
 
   function mapDtoToDisplayMessage(dtoMsg: SendMessageDto, tempId: string): DisplayMessage {
     return {
-      id: tempId, // Use the generated temporary ID
+      _id: tempId, // Use the generated temporary ID
       roomId: dtoMsg.roomId,
       senderId: {
         _id: dtoMsg.senderId,
@@ -202,13 +202,13 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
           messages.value.splice(pendingIndex, 1, displayMsg);
         } else {
           // No matching pending message, check for duplicates by final ID
-          const isDuplicate = messages.value.some(m => !m.isPending && m.id === displayMsg.id);
+          const isDuplicate = messages.value.some(m => !m.isPending && m._id === displayMsg._id);
           console.log(`   Is duplicate (by final ID)? ${isDuplicate}`);
           if (!isDuplicate) {
             console.log('   Adding confirmed DisplayMessage to messages ref...');
             messages.value.push(displayMsg);
           } else {
-            console.log('   Duplicate confirmed message ignored:', displayMsg.id);
+            console.log('   Duplicate confirmed message ignored:', displayMsg._id);
           }
         }
 

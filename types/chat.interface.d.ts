@@ -14,7 +14,7 @@ interface ChatMessage {
 }
 
 interface DisplayMessage {
-  id: string; // Use _id if available, otherwise a temporary client ID
+  _id: string; // Use _id if available, otherwise a temporary client ID
   roomId: string;
   senderId: { // Always represent as an object for consistency in template
     _id: string;
