@@ -81,7 +81,7 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
     }
 
     return {
-      id: chatMsg._id, // Use the real _id
+      id: chatMsg._id,
       roomId: chatMsg.roomId,
       senderId: senderObj,
       senderName: derivedSenderName, // Use derived name
@@ -96,9 +96,10 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
     return {
       id: tempId, // Use the generated temporary ID
       roomId: dtoMsg.roomId,
-      senderId: { // Create the object structure
+      senderId: {
         _id: dtoMsg.senderId,
-        name: dtoMsg.senderName, // Use name from DTO
+        name: dtoMsg.senderName,
+        email: undefined
       },
       senderName: dtoMsg.senderName, // Use name from DTO
       content: dtoMsg.content,
@@ -189,7 +190,6 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
           m.isPending &&
           m.senderId._id === displayMsg.senderId._id &&
           m.content === displayMsg.content
-          // Optionally add a time check: && Math.abs(new Date(m.createdAt).getTime() - new Date(displayMsg.createdAt).getTime()) < 5000 // Within 5s
         );
 
         if (pendingIndex !== -1) {
