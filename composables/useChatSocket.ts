@@ -110,8 +110,8 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
   }
 
 
-  // --- Connect Function (No major changes needed) ---
-  const connect = async () => { /* ... connect logic ... */
+  // --- Connect Function ---
+  const connect = async () => {
     if (socket || isConnecting.value) return;
     console.log(`Connecting to room ${roomId}...`);
     isConnecting.value = true;
@@ -139,7 +139,11 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
       isConnecting.value = false;
       return;
     }
-    socket = io(backendUrl, { /* ... options ... */ });
+    socket = io(backendUrl, {
+      forceNew: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 3000,
+    });
     setupSocketListeners();
   };
 
@@ -226,12 +230,32 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
     socket.on('error', (errorMessage: string | { message: string }) => { /* ... */ });
   }
 
-  // --- Cleanup, Disconnect, SendMessage (No changes needed in signatures) ---
-  const cleanupSocketListeners = () => { /* ... */ };
-  const disconnect = () => { /* ... */ };
+  const cleanupSocketListeners = () => {
+    if (socket) {
+      socket.off('connect');
+      socket.off('disconnect');
+      socket.off('connect_error');
+      socket.off('newMessage');
+      socket.off('joinedRoom');
+      socket.off('error');
+    }
+  };
+  const disconnect = () => {
+    if (socket) {
+      console.log('Disconnecting WebSocket...');
+      cleanupSocketListeners();
+      socket.disconnect();
+      socket = null;
+    }
+    isConnected.value = false;
+    isConnecting.value = false;
+  };
   // SendMessage still takes the original parameters, mapping happens on receive
   const sendMessage = (content: string, senderId: string, senderName: string) => {
-    if (!socket || !isConnected.value || !content.trim()) { /* ... checks ... */ return; }
+    if (!socket || !isConnected.value || !content.trim()) {
+      console.warn('Cannot send message: WebSocket not connected.');
+      return;
+    }
 
     // This payload should match exactly what the server's 'sendMessage' event expects
     const messagePayload: SendMessageDto = {
@@ -240,8 +264,15 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
       senderId: senderId,
       senderName: senderName,
     };
+
     console.log('Sending message via WebSocket:', messagePayload);
-    socket.emit('sendMessage', messagePayload, (ack: any) => { /* ... ack handling ... */ });
+    socket.emit('sendMessage', messagePayload, (ack: any) => {
+      if (ack?.error) {
+        console.error("Server error sending message:", ack.error);
+      } else if (ack?.success) {
+        console.log("Message sent successfully (acknowledged)");
+      }
+    });
 
     // --- OPTIONAL: Add optimistic update immediately on send ---
     // You could add the message here *as well* as waiting for the echo,
