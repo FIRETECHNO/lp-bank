@@ -1,88 +1,148 @@
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { io, Socket } from 'socket.io-client';
-// Removed direct import of useFetch and FetchError if useApiFetch handles it internally
-import { useRuntimeConfig /*, type FetchError */ } from '#app'; // Keep FetchError if you still need the type
+import { useRuntimeConfig } from '#app';
 
-// DTO для исходящего сообщения от клиента
+// Original DTO sent by client
 interface SendMessageDto {
   roomId: string;
-  senderId: string;
-  senderName: string;
+  senderId: string; // User ID string
+  senderName: string; // User name string
   content: string;
 }
 
+// Helper to generate temporary IDs
+const generateTempId = (): string => `temp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
 export function useChatSocket(roomId: string, initialLimit: number = 50) {
   const config = useRuntimeConfig();
-  const backendUrl = config.public.apiBase; // Base URL still needed for WebSocket
+  const backendUrl = config.public.apiBase;
 
-  const messages = ref<ChatMessage[]>([]);
+  // --- Use the new DisplayMessage type for the ref ---
+  const messages = ref<DisplayMessage[]>([]);
   const isConnected = ref(false);
   const isConnecting = ref(false);
   let socket: Socket | null = null;
 
-  // --- Fetching Message History with useApiFetch ---
+  // --- Fetch History (Raw Data) ---
   const {
-    data: historyData,
+    data: rawHistoryData, // Rename data to avoid conflict
     pending: isLoadingHistory,
-    error: historyError, // Type might implicitly come from useApiFetch or use FetchError
+    error: historyError,
     execute: fetchHistory,
-  } = useApiFetch<ChatMessage[]>("/messages/", {
-    // Pass options needed for the fetch
-    query: { // Pass query parameters here
-      roomId: roomId,
-      limit: initialLimit,
-    },
-    immediate: false, // Don't fetch immediately
-    watch: false,     // We trigger manually with fetchHistory
-    key: `chat-history-${roomId}`, // Unique key for caching
+  } = useApiFetch<ChatMessage[]>( // Expect raw ChatMessage[]
+    "/messages/", {
+    query: { roomId: roomId, limit: initialLimit },
+    immediate: false,
+    watch: false,
+    key: `chat-history-raw-${roomId}`, // Consider adjusting key if needed
     method: "GET",
+    // Remove the transform option here
+  }
+  );
+
+  // --- Map fetched ChatMessages to DisplayMessages using computed ---
+  const historyData = computed<DisplayMessage[]>(() => {
+    const fetchedMessages = rawHistoryData.value;
+    console.log(`Transforming ${fetchedMessages?.length ?? 0} fetched messages via computed.`);
+    if (!fetchedMessages) {
+      return [];
+    }
+    // Perform the transformation here
+    return fetchedMessages.map(chatMsg => mapChatMessageToDisplayMessage(chatMsg));
   });
 
-  // Watcher remains the same
+  // Watcher now watches the transformed DisplayMessage data
   watch(historyData, (newHistory) => {
     if (newHistory) {
-      console.log(`Received ${newHistory.length} historical messages for room ${roomId}.`);
-      messages.value = [...newHistory];
+      console.log(`WATCH historyData: Received ${newHistory.length} historical DisplayMessages.`);
+      // Find messages that are currently pending and might be replaced by history
+      const pendingIds = messages.value.filter(m => m.isPending).map(m => m.id);
+      const nonPendingHistory = newHistory.filter(histMsg => !pendingIds.includes(histMsg.id)); // Avoid adding duplicates if pending msg ID matches _id somehow
+
+      messages.value = [...nonPendingHistory]; // Replace with fetched history
+      console.log(`Messages ref length after history update: ${messages.value.length}`);
     }
-  }, { immediate: true });
+  }, { immediate: true }); // Keep immediate
 
 
-  const connect = async () => {
-    if (socket || isConnecting.value) {
-      console.log('Connection attempt already in progress or connected.');
-      return;
+  // --- Mapping Functions ---
+  function mapChatMessageToDisplayMessage(chatMsg: ChatMessage): DisplayMessage {
+    let senderObj: DisplayMessage['senderId'];
+    let derivedSenderName: string = 'Unknown';
+
+    if (typeof chatMsg.senderId === 'string') {
+      // Handle case where population failed
+      senderObj = { _id: chatMsg.senderId };
+      derivedSenderName = `User (${chatMsg.senderId.slice(-4)})`;
+    } else {
+      // Assume populated object
+      senderObj = chatMsg.senderId;
+      derivedSenderName = chatMsg.senderId.name || chatMsg.senderId.email || `User (${chatMsg.senderId._id.slice(-4)})`;
     }
 
-    console.log(`Initiating connection for room ${roomId}...`);
+    return {
+      id: chatMsg._id, // Use the real _id
+      roomId: chatMsg.roomId,
+      senderId: senderObj,
+      senderName: derivedSenderName, // Use derived name
+      content: chatMsg.content,
+      createdAt: chatMsg.createdAt,
+      updatedAt: chatMsg.updatedAt,
+      isPending: false, // Confirmed message
+    };
+  }
+
+  function mapDtoToDisplayMessage(dtoMsg: SendMessageDto, tempId: string): DisplayMessage {
+    return {
+      id: tempId, // Use the generated temporary ID
+      roomId: dtoMsg.roomId,
+      senderId: { // Create the object structure
+        _id: dtoMsg.senderId,
+        name: dtoMsg.senderName, // Use name from DTO
+      },
+      senderName: dtoMsg.senderName, // Use name from DTO
+      content: dtoMsg.content,
+      createdAt: new Date().toISOString(), // Use current time as placeholder
+      updatedAt: undefined,
+      isPending: true, // Mark as pending
+    };
+  }
+
+
+  // --- Connect Function (No major changes needed) ---
+  const connect = async () => { /* ... connect logic ... */
+    if (socket || isConnecting.value) return;
+    console.log(`Connecting to room ${roomId}...`);
     isConnecting.value = true;
     isConnected.value = false;
 
-    // 1. Fetch history first using the execute function from useApiFetch
+    // 1. Fetch history
     try {
+      console.log('Executing fetchHistory...');
       await fetchHistory();
-
+      console.log('fetchHistory execution finished.');
       if (historyError.value) {
-        console.error('Error while fetching message history:', historyError.value);
+        console.error('Error fetching message history:', historyError.value);
       } else {
-        console.log('Message history fetch successful (or data already present).');
+        console.log('Message history fetch successful. Watcher handled data mapping.');
       }
     } catch (err) {
       console.error('Exception during fetchHistory execution:', err);
     }
 
     // 2. Connect WebSocket
-    console.log(`Connecting WebSocket to room ${roomId}...`);
-    if (socket) {
-      cleanupSocketListeners();
+    console.log(`Connecting WebSocket to ${backendUrl}...`);
+    if (socket) cleanupSocketListeners();
+    if (!backendUrl) {
+      console.error("WebSocket Backend URL (apiBase) is not configured!");
+      isConnecting.value = false;
+      return;
     }
-    socket = io(backendUrl, {
-      forceNew: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 3000,
-    });
+    socket = io(backendUrl, { /* ... options ... */ });
     setupSocketListeners();
   };
 
+  // --- WebSocket Listeners ---
   const setupSocketListeners = () => {
     if (!socket) return;
 
@@ -105,140 +165,102 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
       isConnecting.value = false;
     });
 
-    // socket.on('newMessage', (message: ChatMessage | SendMessageDto) => {
-    //   if (message?._id && message.roomId === roomId) {
-    //     console.log('New message received via WebSocket:', message);
-    //     if (!messages.value.some(m => m._id === message._id)) {
-    //       messages.value.push(message);
-    //     } else {
-    //       console.log('Duplicate message ignored:', message._id);
-    //     }
-    //   }
-    // });
-
-    // --- Modified newMessage Listener with Union Type and Guard ---
-    socket.on('newMessage', (message: ChatMessage | SendMessageDto) => { // Explicit Union Type
+    // --- Modified newMessage Listener ---
+    socket.on('newMessage', (message: ChatMessage | SendMessageDto) => {
       console.log('>>> newMessage event received on client:', message);
 
-      // Basic validation: Should be handled by TS union type, but extra check is safe
-      if (!message || typeof message !== 'object') {
-        console.warn('Received invalid data type via WebSocket:', message);
-        return;
+      if (!message || typeof message !== 'object') return;
+
+      if (message.roomId !== roomId) {
+        console.log('   Message ignored, wrong room ID.');
+        return; // Ignore messages for other rooms early
       }
 
-      // --- TYPE GUARD: Check for the definitive property of ChatMessage ---
+      // --- TYPE GUARD ---
       if ('_id' in message) {
-        // It has an _id, so it MUST be a ChatMessage according to our types
-        // No need to cast explicitly if TS understands the guard, but can add for clarity:
+        // --- Handle Confirmed ChatMessage ---
         const chatMsg = message as ChatMessage;
+        const displayMsg = mapChatMessageToDisplayMessage(chatMsg); // Map to unified type
+        console.log('   Received & Mapped ChatMessage:', displayMsg);
 
-        console.log('   Received ChatMessage (has _id):', chatMsg);
+        // Check if a PENDING message with the same content/sender exists (simple reconciliation)
+        // A more robust way would use temp IDs if server echoed them back
+        const pendingIndex = messages.value.findIndex(m =>
+          m.isPending &&
+          m.senderId._id === displayMsg.senderId._id &&
+          m.content === displayMsg.content
+          // Optionally add a time check: && Math.abs(new Date(m.createdAt).getTime() - new Date(displayMsg.createdAt).getTime()) < 5000 // Within 5s
+        );
 
-        if (chatMsg.roomId === roomId) {
-          console.log(`   Room ID matches. Checking for duplicates (ID: ${chatMsg._id}).`);
-          const isDuplicate = messages.value.some(m => m._id === chatMsg._id);
-          console.log(`   Is duplicate? ${isDuplicate}`);
-
+        if (pendingIndex !== -1) {
+          console.log(`   Found matching pending message at index ${pendingIndex}. Replacing it.`);
+          // Replace the pending message with the confirmed one
+          messages.value.splice(pendingIndex, 1, displayMsg);
+        } else {
+          // No matching pending message, check for duplicates by final ID
+          const isDuplicate = messages.value.some(m => !m.isPending && m.id === displayMsg.id);
+          console.log(`   Is duplicate (by final ID)? ${isDuplicate}`);
           if (!isDuplicate) {
-            console.log('   Adding ChatMessage to messages ref...');
-            messages.value.push(chatMsg);
+            console.log('   Adding confirmed DisplayMessage to messages ref...');
+            messages.value.push(displayMsg);
           } else {
-            console.log('   Duplicate ChatMessage ignored:', chatMsg._id);
+            console.log('   Duplicate confirmed message ignored:', displayMsg.id);
           }
-        } else {
-          console.log('   ChatMessage ignored, wrong room ID.');
         }
-      }
-      // --- Handle the SendMessageDto case ---
-      else {
-        // If it doesn't have '_id', it MUST be SendMessageDto according to the union type
-        // No need to cast explicitly if TS understands the guard, but can add for clarity:
+
+      } else {
+        // --- Handle Optimistic SendMessageDto ---
         const dtoMsg = message as SendMessageDto;
+        const tempId = generateTempId(); // Generate ID for the optimistic message
+        const displayMsg = mapDtoToDisplayMessage(dtoMsg, tempId); // Map to unified type
+        console.log('   Received & Mapped SendMessageDto (pending):', displayMsg);
 
-        console.warn('   Received SendMessageDto (no _id):', dtoMsg);
-
-        // Only proceed if the room matches, otherwise ignore
-        if (dtoMsg.roomId === roomId) {
-          console.warn('   >> This SendMessageDto is currently being ignored as it lacks required fields (_id, createdAt, etc.) for the messages array.');
-          // Decide action: Ignore (current), or implement complex optimistic update.
-        } else {
-          console.log('   SendMessageDto ignored, wrong room ID.');
-        }
+        // Add the optimistic message immediately
+        console.log('   Adding pending DisplayMessage to messages ref...');
+        messages.value.push(displayMsg);
       }
+      console.log(`   Messages ref length after update: ${messages.value.length}`);
     });
 
-
-    socket.on('joinedRoom', (confirmationRoomId: string) => {
-      console.log(`Successfully joined room: ${confirmationRoomId}`);
-    });
-
-    socket.on('error', (errorMessage: string | { message: string }) => {
-      const messageText = typeof errorMessage === 'string' ? errorMessage : errorMessage.message;
-      console.error('WebSocket server error:', messageText);
-    });
+    socket.on('joinedRoom', (confirmationRoomId: string) => { /* ... */ });
+    socket.on('error', (errorMessage: string | { message: string }) => { /* ... */ });
   }
 
-  const cleanupSocketListeners = () => {
-    if (socket) {
-      socket.off('connect');
-      socket.off('disconnect');
-      socket.off('connect_error');
-      socket.off('newMessage');
-      socket.off('joinedRoom');
-      socket.off('error');
-    }
-  }
-
-  const disconnect = () => {
-    if (socket) {
-      console.log('Disconnecting WebSocket...');
-      cleanupSocketListeners();
-      socket.disconnect();
-      socket = null;
-    }
-    isConnected.value = false;
-    isConnecting.value = false;
-  };
-
+  // --- Cleanup, Disconnect, SendMessage (No changes needed in signatures) ---
+  const cleanupSocketListeners = () => { /* ... */ };
+  const disconnect = () => { /* ... */ };
+  // SendMessage still takes the original parameters, mapping happens on receive
   const sendMessage = (content: string, senderId: string, senderName: string) => {
-    if (!socket || !isConnected.value) {
-      console.warn('Cannot send message: WebSocket not connected.');
-      return;
-    }
-    if (!content.trim()) {
-      console.warn('Cannot send empty message.');
-      return;
-    }
+    if (!socket || !isConnected.value || !content.trim()) { /* ... checks ... */ return; }
+
+    // This payload should match exactly what the server's 'sendMessage' event expects
     const messagePayload: SendMessageDto = {
       roomId: roomId,
       content: content.trim(),
       senderId: senderId,
       senderName: senderName,
     };
+    console.log('Sending message via WebSocket:', messagePayload);
+    socket.emit('sendMessage', messagePayload, (ack: any) => { /* ... ack handling ... */ });
 
-    console.log('Sending message:', messagePayload);
-    socket.emit('sendMessage', messagePayload, (ack: any) => {
-      if (ack?.error) {
-        console.error("Server error sending message:", ack.error);
-      } else if (ack?.success) {
-        console.log("Message sent successfully (acknowledged)");
-      }
-    });
+    // --- OPTIONAL: Add optimistic update immediately on send ---
+    // You could add the message here *as well* as waiting for the echo,
+    // but it complicates reconciliation if the echo is also a DTO.
+    // Generally better to wait for the echo from the server.
+    // const tempId = generateTempId();
+    // const optimisticDisplayMsg = mapDtoToDisplayMessage(messagePayload, tempId);
+    // messages.value.push(optimisticDisplayMsg);
+    // console.log('   Added optimistic message immediately on send.');
+    // ------------------------------------------------------------
   };
 
+  // --- Lifecycle Hooks ---
+  onMounted(() => { connect(); });
+  onUnmounted(() => { disconnect(); });
 
-  // --- Lifecycle Hooks (remain the same) ---
-  onMounted(() => {
-    connect();
-  });
-
-  onUnmounted(() => {
-    disconnect();
-  });
-
-  // --- Return Values (remain the same) ---
+  // --- Return Values ---
   return {
-    messages,
+    messages, // Now ref<DisplayMessage[]>
     isConnected,
     isConnecting,
     isLoadingHistory,

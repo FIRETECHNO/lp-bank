@@ -12,7 +12,7 @@ const userStore = useAuth();
 const roomId = computed(() => route.params.roomId as string);
 
 const {
-  messages,
+  messages, // This is now ref<DisplayMessage[]>
   isConnected,
   isConnecting,
   isLoadingHistory,
@@ -22,65 +22,50 @@ const {
 } = useChatSocket(roomId.value);
 
 const newMessage = ref('');
+const messageListElement = ref<HTMLElement | null>(null); // Ref for scrolling
 
 const handleSend = () => {
   if (!userStore.user?._id) {
-    console.error("User ID not available for sending message.");
+    console.error("User ID not available.");
     return;
   }
-  const userName = userStore.user.name || userStore.user.email || 'Error user';
+  const userName = userStore.user.name || userStore.user.email || 'Unknown User';
   sendMessage(newMessage.value, userStore.user._id, userName);
   newMessage.value = '';
 };
 
 const formatTimestamp = (timestamp?: string): string => {
+  // ... (no change needed, handles string)
   if (!timestamp) return '';
   try {
     return new Date(timestamp).toLocaleString();
-  } catch (e) {
-    console.error("Error formatting timestamp:", e);
-    return 'Invalid date';
-  }
+  } catch (e) { return 'Invalid date'; }
 };
 
-const getSenderName = (msg: ChatMessage): string => {
-  const sender = msg.senderId; // Use the message senderId
-
-  // 1. Handle explicitly missing senderId (likely data loading issue, not "System")
-  if (!sender) {
-    // Log this to understand why it happens (SSR data issue?)
-    // console.warn(`Message ${msg._id} is missing senderId during render.`);
-    return 'Пользователь...'; // Or "Loading Name..." - less confusing than "System"
-  }
-
-  // 2. Handle case where population failed and it's just an ID string
-  if (typeof sender === 'string') {
-    // Check if this ID matches the current logged-in user
-    if (sender === userStore.user?._id) {
-      return 'Вы'; // Or use userStore.user.name if available
-    }
-    return `User (${sender.slice(-4)})`; // Fallback using partial ID
-  }
-
-  // 3. Handle successfully populated sender object
-  // Check if this sender matches the current logged-in user
-  if (sender._id === userStore.user?._id) {
-    return 'You'; // Display "You" for messages sent by the current user
-  }
-  // Otherwise, use the populated name or username
-  return sender.name || sender.username || `Пользователь (${sender._id.slice(-4)})`; // Fallback using partial ID
+// --- Use DisplayMessage type ---
+const getSenderName = (msg: DisplayMessage): string => {
+  // Access the pre-formatted senderName or derive from senderId object
+  return msg.senderName || `User (${msg.senderId._id.slice(-4)})`;
 };
 
-// --- Helper to check if the message is from the current user ---
-const isMyMessage = (msg: any): boolean => {
-  const sender = msg.senderId;
-  if (!sender || !userStore.user?._id) {
+// --- Use DisplayMessage type ---
+const isMyMessage = (msg: DisplayMessage): boolean => {
+  if (!userStore.user?._id) {
     return false;
   }
-  // Check based on ID, whether senderId is string or object
-  const senderIdVal = typeof sender === 'string' ? sender : sender._id;
-  return senderIdVal === userStore.user._id;
+  // Check based on the _id within the senderId object
+  return msg.senderId._id === userStore.user._id;
 };
+
+// --- Auto Scroll ---
+watch(messages, async () => {
+  // Wait for the DOM to update after messages array changes
+  await nextTick();
+  const listEl = messageListElement.value;
+  if (listEl) {
+    listEl.scrollTop = listEl.scrollHeight; // Scroll to bottom
+  }
+}, { deep: true }); // deep watch needed as objects inside array change
 
 </script>
 
