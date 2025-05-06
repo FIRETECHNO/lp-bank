@@ -21,6 +21,12 @@ const {
   fetchHistory,
 } = useChatSocket(roomId.value);
 
+const {
+  currentChat,
+  fetchChatDetails,
+  isLoadingChatDetails,
+} = useChat(roomId.value);
+
 const newMessage = ref('');
 const messageListElement = ref<HTMLElement | null>(null); // Ref for scrolling
 
@@ -48,6 +54,14 @@ const getSenderName = (msg: DisplayMessage): string => {
   return msg.senderName || `User (${msg.senderId._id.slice(-4)})`;
 };
 
+const getChatName = computed(() => {
+  if (!userStore.user?._id || isLoadingChatDetails.value) return "Загрузка...";
+
+  if (userStore.user._id == currentChat.value?.sender._id)
+    return currentChat.value?.receiver.name + " " + currentChat.value?.receiver.surname;
+  return currentChat.value?.sender.name + " " + currentChat.value?.sender.surname;
+})
+
 // --- Use DisplayMessage type ---
 const isMyMessage = (msg: DisplayMessage): boolean => {
   if (!userStore.user?._id) {
@@ -67,11 +81,12 @@ watch(messages, async () => {
   }
 }, { deep: true }); // deep watch needed as objects inside array change
 
+fetchChatDetails()
 </script>
 
 <template>
   <div class="chat-container">
-    <h1>Чат комнаты: {{ roomId }}</h1>
+    <h1>{{ getChatName }}</h1>
 
     <!-- Status indicators -->
     <div class="status-container">

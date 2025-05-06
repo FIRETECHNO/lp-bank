@@ -5,7 +5,7 @@ definePageMeta({
 const chatStore = useChat();
 const router = useRouter()
 
-let { chats } = storeToRefs(chatStore)
+let { chats } = chatStore
 
 function joinRoom(chatId: string) {
   router.push(`/chats/${chatId}`)

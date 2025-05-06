@@ -28,3 +28,9 @@ interface DisplayMessage {
   // Add senderName directly if needed for consistency, populated from DTO or ChatMessage.senderId
   senderName: string;
 }
+
+interface ChatDetails {
+  _id: string;
+  sender: any;
+  receiver: any;
+}

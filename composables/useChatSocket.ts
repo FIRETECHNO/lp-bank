@@ -30,14 +30,15 @@ export function useChatSocket(roomId: string, initialLimit: number = 50) {
     error: historyError,
     execute: fetchHistory,
   } = useApiFetch<ChatMessage[]>( // Expect raw ChatMessage[]
-    "/messages/", {
-    query: { roomId: roomId, limit: initialLimit },
-    immediate: false,
-    watch: false,
-    key: `chat-history-raw-${roomId}`, // Consider adjusting key if needed
-    method: "GET",
-    // Remove the transform option here
-  }
+    "/messages/",
+    {
+      query: { roomId: roomId, limit: initialLimit },
+      immediate: false,
+      watch: false,
+      key: `chat-history-raw-${roomId}`, // Consider adjusting key if needed
+      method: "GET",
+      // Remove the transform option here
+    }
   );
 
   // --- Map fetched ChatMessages to DisplayMessages using computed ---
