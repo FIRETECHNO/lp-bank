@@ -1,10 +1,4 @@
 <script setup lang="ts">
-const emit = defineEmits(["next", "prev"])
-defineProps({
-  canGoNext: Boolean,
-  canGoPrev: Boolean
-})
-
 let form = reactive({
   gender: "",
   langLevel: null,
@@ -34,11 +28,6 @@ function langLevelItemProps(item: Record<string, string>) {
     subtitle: item.description,
   }
 }
-
-watch(form, (newVal) => {
-  console.log(newVal);
-
-})
 </script>
 <template>
   <!-- пол -->
@@ -47,6 +36,9 @@ watch(form, (newVal) => {
   <!-- цель разговорной практики, опишите идеального партнера -->
   <v-card class="d-flex flex-column pa-4">
     <v-row>
+      <v-col cols="12">
+        <h1>Личная информация</h1>
+      </v-col>
       <v-col cols="12">
         <v-radio-group inline v-model="form.gender">
           <v-radio label="Мужчина" value="male"></v-radio>
@@ -63,16 +55,6 @@ watch(form, (newVal) => {
       </v-col>
       <v-col cols="12">
         <v-textarea label="Опишите идеального партнера" variant="outlined"></v-textarea>
-      </v-col>
-      <v-col cols="6">
-        <v-btn @click="emit('prev')">
-          prev
-        </v-btn>
-      </v-col>
-      <v-col cols="6" class="d-flex justify-end">
-        <v-btn @click="emit('next')">
-          next
-        </v-btn>
       </v-col>
     </v-row>
   </v-card>
