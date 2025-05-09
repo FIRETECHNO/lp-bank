@@ -7,7 +7,9 @@ const emit = defineEmits(["next", "prev"])
     <!-- пол -->
 
     <!-- возраст -->
-    <v-range-slider :min="18" :max="80" step="5" thumb-label="always"></v-range-slider>
+    sdfsdf
+    dsfsdfdsf
+    <!-- <v-range-slider :min="18" :max="80" step="5" thumb-label="always"></v-range-slider> -->
     <v-btn @click="emit('next')">
       next
     </v-btn>

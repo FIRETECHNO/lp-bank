@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ComponentListItem } from '~/types/component-list';
 
-import { AboutMePartnerFilters, AboutMePersonal } from '#components';
+import { AboutMePersonal, AboutMePartnerFilters } from '#components';
 
 const steps: ComponentListItem[] =
   [
@@ -41,7 +41,6 @@ const {
   size,
   eventHandlers
 } = useComponentNavigator(steps);
-
 </script>
 <template>
   <v-container>
