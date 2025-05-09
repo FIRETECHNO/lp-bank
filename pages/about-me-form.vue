@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { ComponentListItem } from '~/types/component-list';
 
-import { AboutMeLangLevel, AboutMePersonal } from '#components';
+import { AboutMePartnerFilters, AboutMePersonal } from '#components';
 
 const steps: ComponentListItem[] =
   [
     {
-      id: "step1", component: AboutMeLangLevel,
+      id: "step1", component: AboutMePersonal,
       eventHandlers: {
         next: () => {
           nextStep()
@@ -17,7 +17,7 @@ const steps: ComponentListItem[] =
       }
     },
     {
-      id: "step2", component: AboutMePersonal,
+      id: "step2", component: AboutMePartnerFilters,
       eventHandlers: {
         next: () => {
           nextStep()
