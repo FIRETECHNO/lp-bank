@@ -1,5 +1,10 @@
 <script setup lang="ts">
 let step = ref<number>(1)
+
+
+function submit() {
+  // save all data
+}
 </script>
 <template>
   <v-container>
@@ -16,11 +21,10 @@ let step = ref<number>(1)
 
           <v-window-item :value="3" class="pa-2">
             <div class="pa-4 text-center">
-              <v-img class="mb-4" height="128" src="https://cdn.vuetifyjs.com/images/logos/v.svg"></v-img>
               <h3 class="text-h6 font-weight-light mb-2">
-                Welcome to Vuetify
+                Добро пожаловать
               </h3>
-              <span class="text-caption text-grey">Thanks for signing up!</span>
+              <span class="text-caption text-grey">Спасибо за вход!</span>
             </div>
           </v-window-item>
         </v-window>
@@ -31,6 +35,9 @@ let step = ref<number>(1)
           <v-spacer></v-spacer>
           <v-btn v-if="step < 3" color="primary" variant="flat" @click="step++">
             Следующий шаг
+          </v-btn>
+          <v-btn v-if="step == 3" color="success" variant="flat" @click="submit">
+            сохранить анкету
           </v-btn>
         </v-card-actions>
       </v-col>

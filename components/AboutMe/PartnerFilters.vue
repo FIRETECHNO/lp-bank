@@ -2,8 +2,10 @@
 let form = reactive({
   gender: "",
   langLevel: null,
+  minAge: 0,
+  maxAge: 0
 })
-let range = ref([15, 40])
+let ageRange = ref([20, 40])
 
 const langLevels = [
   {
@@ -29,6 +31,10 @@ function langLevelItemProps(item: Record<string, string>) {
     subtitle: item.description,
   }
 }
+watch(ageRange, (newValue) => {
+  form.minAge = newValue[0]
+  form.maxAge = newValue[1]
+})
 </script>
 <template>
   <!-- уровень -->
@@ -45,13 +51,13 @@ function langLevelItemProps(item: Record<string, string>) {
       </v-col>
       <v-col cols="12">
         Возраст от, до
-        <v-range-slider v-model="range" :max="90" :min="15" :step="5" class="align-center" hide-details>
+        <v-range-slider v-model="ageRange" :max="90" :min="15" :step="5" class="align-center" hide-details>
           <template v-slot:prepend>
-            <v-text-field v-model="range[0]" density="compact" style="width: 70px" type="number" variant="outlined"
+            <v-text-field v-model="ageRange[0]" density="compact" style="width: 70px" type="number" variant="outlined"
               hide-details single-line></v-text-field>
           </template>
           <template v-slot:append>
-            <v-text-field v-model="range[1]" density="compact" style="width: 70px" type="number" variant="outlined"
+            <v-text-field v-model="ageRange[1]" density="compact" style="width: 70px" type="number" variant="outlined"
               hide-details single-line></v-text-field>
           </template>
         </v-range-slider>
