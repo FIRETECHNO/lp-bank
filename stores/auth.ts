@@ -201,12 +201,18 @@ export const useAuth = defineStore('auth', () => {
     }
   }
 
+  async function updateAboutMe(data: { personal?: any, partnerFilters?: any }) {
+    let result = await AuthAPI.updateAboutMe(data);
+    console.log(result);
+
+  }
+
   return {
     // variables
     user, receivedMatches, sentMatches,
     // functions
     registration, login, checkAuth, logout,
     updateUser, sendResetLink, resetPassword, registerStudent,
-    getAllUsers, uploadAvatar, Equals, populateMatches,
+    getAllUsers, uploadAvatar, Equals, populateMatches, updateAboutMe
   }
 })
