@@ -39,9 +39,9 @@ export default {
   uploadAvatar(formData: FormData, userId: string) {
     return useApiFetch(`/auth/upload-avatar?user_id=${userId}`, { method: 'POST', headers: { 'Content-Type': 'multipart/form-data' }, body: formData })
   },
-  updateAboutMe(data: { personal?: any, partnerFilters?: any }): Promise<{ updatedUser: User }> {
+  updateAboutMe(data: { userId: string, personal?: any, partnerFilters?: any }): Promise<{ updatedUser: User }> {
     const { $apiFetch } = useNuxtApp();
-    return $apiFetch<{ updatedUser: User }>('/user/update-about-me', { // Adjust endpoint if needed
+    return $apiFetch<{ updatedUser: User }>('/user/update-about', {
       method: 'POST',
       body: data,
     });

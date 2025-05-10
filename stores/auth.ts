@@ -201,10 +201,17 @@ export const useAuth = defineStore('auth', () => {
     }
   }
 
-  async function updateAboutMe(data: { personal?: any, partnerFilters?: any }) {
-    let result = await AuthAPI.updateAboutMe(data);
-    console.log(result);
+  async function updateAboutMe(data: { personal?: any, partnerFilters?: any }): Promise<{ success: boolean }> {
+    if (!user.value?._id)
+      return { success: false };
 
+    let result = await AuthAPI.updateAboutMe({ userId: user.value._id, ...data });
+
+    if (result?.updatedUser != null) {
+      user.value = result.updatedUser;
+      return { success: true };
+    }
+    return { success: false };
   }
 
   return {

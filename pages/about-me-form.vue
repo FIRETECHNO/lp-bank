@@ -7,6 +7,7 @@ interface ValidatableComponent {
 }
 
 const userStore = useAuth();
+const router = useRouter();
 
 const step = ref<number>(1);
 
@@ -49,8 +50,19 @@ function prevStep() {
   }
 }
 
-function submit() {
-  userStore.updateAboutMe(formData);
+async function submit() {
+  let res = await userStore.updateAboutMe(formData);
+  if (res.success) {
+    toast("Ваша информация обновлена!", {
+      type: "success",
+      autoClose: 700,
+      onClose: () => {
+        router.push("/")
+      }
+    })
+  } else {
+    // do nothing, cuz all errors are handled in $apiFetch
+  }
 }
 </script>
 
