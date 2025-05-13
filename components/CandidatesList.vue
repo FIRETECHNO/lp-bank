@@ -59,10 +59,12 @@ function handleDislike(userId: string) {
 }
 
 // --- Жизненный цикл и загрузка данных ---
-if (matchStore.candidates.length === 0 && !matchStore.isLoadingMatches) {
-  console.log("No initial candidates in store, fetching...");
-  await matchStore.fetchMatches();
-}
+onMounted(async () => {
+  if (matchStore.candidates.length === 0 && !matchStore.isLoadingMatches) {
+    console.log("No initial candidates in store, fetching...");
+    await matchStore.fetchMatches();
+  }
+})
 // --- Вычисляемые свойства для состояний UI ---
 
 const showLoading = computed(() => {
@@ -86,7 +88,7 @@ const showError = computed(() => {
 <template>
   <v-container>
     <v-row class="d-flex justify-center">
-      <v-col cols="12" md="11" xl="10">
+      <v-col cols="12">
 
         <!-- Состояние загрузки -->
         <div v-if="showLoading" class="text-center pa-5 fill-height d-flex flex-column justify-center align-center"
@@ -108,11 +110,9 @@ const showError = computed(() => {
 
         <!-- Список кандидатов -->
         <!-- Показываем, если не загрузка, не ошибка, и есть кандидаты -->
-        <v-row v-else-if="matchStore.candidates.length > 0" class="d-flex justify-center align-stretch">
-          <v-col v-for="candidate in matchStore.candidates" :key="candidate._id" cols="12" sm="6" md="4" lg="3"
-            class="d-flex">
-            <CandidateCard :candidate="candidate" @like="handleLike(candidate._id)"
-              @dislike="handleDislike(candidate._id)" class="flex-grow-1" />
+        <v-row v-else-if="matchStore.candidates.length > 0" class="d-flex justify-start">
+          <v-col cols="12" xl="6" v-for="(candidate) of matchStore.candidates" :key="candidate._id">
+            {{ candidate }}
           </v-col>
         </v-row>
 

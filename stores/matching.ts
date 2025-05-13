@@ -10,49 +10,34 @@ import { useAuth } from "./auth"; // Assuming your auth store path
 export const useMatching = defineStore('matching', () => {
   // === State ===
   const candidates = ref<User[]>([]);
-  const sentRequests = ref<any[]>([]); // Define type if possible
+  const sentRequests = ref<any[]>([]); // Определите тип, если возможно
   const isLoadingMatches = ref(false);
   const errorLoadingMatches = ref<Error | null>(null);
 
-  // Access the injected API service
-  // Note: Can't call useNuxtApp() at the top level here, must be inside functions/actions
-  // const { $api } = useNuxtApp(); // <--- DO NOT DO THIS HERE
-
   // === Actions ===
 
-  /**
-   * Fetches potential matches from the API and updates the candidates list.
-   * This action uses $api directly, suitable for calls triggered after setup
-   * (e.g., in onMounted or by user interaction).
-   */
   async function fetchMatches() {
-    // Get $api inside the action where it's needed
-    const { $api } = useNuxtApp();
-    if (isLoadingMatches.value) return; // Prevent concurrent fetches
+    const { $apiFetch } = useNuxtApp();
+
+    if (isLoadingMatches.value) return;
 
     isLoadingMatches.value = true;
     errorLoadingMatches.value = null;
-    console.log("Fetching matches..."); // Debug log
+    console.log("Fetching matches...");
 
     try {
-      const fetchedUsers = await $api.getMatches(); // Use the service
-      candidates.value = fetchedUsers || []; // Update state
-      console.log("Matches fetched:", candidates.value); // Debug log
+      let fetchedUsers: User[] | null = await $apiFetch<User[]>('/matching/get-matches', { method: 'GET' })
+
+      candidates.value = fetchedUsers ?? [];
+      console.log("Matches fetched: ", candidates.value);
     } catch (error: any) {
       errorLoadingMatches.value = error;
-      candidates.value = []; // Clear candidates on error
       console.error("Error fetching matches:", error);
-      // Your api.ts plugin's onResponseError should have handled global errors (toast/redirect)
-      // You might add more specific error handling here if needed
     } finally {
       isLoadingMatches.value = false;
     }
   }
 
-  /**
-   * Sets the initial candidates, potentially from data fetched during SSR/hydration
-   * using useApiFetch in a component.
-   */
   function setInitialCandidates(initialData: User[] | null) {
     if (initialData) {
       candidates.value = initialData;
@@ -60,72 +45,67 @@ export const useMatching = defineStore('matching', () => {
     }
   }
 
-
   /**
-   * Gets the next available candidate from the local list.
+   * Удаляет кандидата из списка по ID (например, после лайка/дизлайка).
    */
-  function getCurrentMatch(): User | null {
-    console.log("Getting current match. Candidates count:", candidates.value.length);
-    if (candidates.value.length > 0) {
-      // Use shift() carefully - it modifies the original array
-      // Consider using a computed property for the current match if you
-      // don't want to remove it immediately.
-      return candidates.value[0]; // Return the first without removing
-      // return candidates.value.shift(); // If you intend to remove it
-    }
-    return null;
-  }
-
-  /**
-   * Removes the first candidate from the list (e.g., after swiping).
-   */
-  function removeCurrentMatch() {
-    if (candidates.value.length > 0) {
-      candidates.value.shift();
-      console.log("Removed current match. Remaining:", candidates.value.length);
+  function removeCandidateById(userId: string) {
+    const index = candidates.value.findIndex(c => c._id === userId);
+    if (index > -1) {
+      candidates.value.splice(index, 1);
+      console.log(`Removed candidate ${userId}. Remaining:`, candidates.value.length);
     }
   }
 
-  /**
-   * Processes a 'like' action via the API.
-   */
   async function processLike(likedUserId: string): Promise<boolean> {
     const { $api } = useNuxtApp();
-    const authStore = useAuth(); // Use your actual auth store composable
+    const authStore = useAuth();
 
     if (!authStore.user?._id) {
       console.warn("Cannot process like: user not logged in.");
-      return false; // Or throw an error
+      return false;
     }
 
     console.log(`Processing like for ${likedUserId} by ${authStore.user._id}`);
     try {
       const response = await $api.processLike(likedUserId, authStore.user._id);
       console.log("Like response:", response);
-      // You might want to check response.isMatch here and trigger another action
-      return response.success; // Return success status from API
+      if (response.success) {
+        // Опционально: удалить из списка локально для мгновенного UI-отклика
+        // removeCandidateById(likedUserId); // Уже делается в компоненте
+      }
+      return response.success;
     } catch (error) {
       console.error("Error processing like:", error);
-      // Global error handling from plugin applies
-      return false; // Indicate failure
+      return false;
     }
   }
 
-  /**
-   * Accepts a match request via the API.
-   */
+  // processDislike - если у вас есть такой API endpoint.
+  // Если дизлайк - это просто удаление из списка без отправки на сервер,
+  // то эту логику можно оставить только в компоненте.
+  // async function processDislike(dislikedUserId: string): Promise<boolean> {
+  //   const { $api } = useNuxtApp();
+  //   // ... логика вызова API для дизлайка
+  //   try {
+  //     // await $api.processDislike(dislikedUserId, authStore.user._id);
+  //     // removeCandidateById(dislikedUserId); // Опционально
+  //     return true;
+  //   } catch (error) {
+  //     console.error("Error processing dislike:", error);
+  //     return false;
+  //   }
+  // }
+
   async function acceptMatch(matchId: string, senderId: string, receiverId: string): Promise<boolean> {
     const { $api } = useNuxtApp();
     if (!matchId || !senderId || !receiverId) {
       console.warn("Missing IDs for acceptMatch");
       return false;
     }
-
     console.log(`Accepting match ${matchId} between ${senderId} and ${receiverId}`);
     try {
       await $api.acceptMatch(matchId, senderId, receiverId);
       console.log("Match accepted successfully");
-      // Maybe update local state (e.g., remove from a 'pending requests' list)
       return true;
     } catch (error) {
       console.error("Error accepting match:", error);
@@ -134,21 +114,15 @@ export const useMatching = defineStore('matching', () => {
   }
 
   return {
-    // State (Refs)
     candidates,
-    sentRequests, // Don't forget to manage this state if needed
+    sentRequests,
     isLoadingMatches,
     errorLoadingMatches,
-
-    // Getters (Computed - if you prefer getters over direct state access)
-    // e.g., hasCandidates: computed(() => candidates.value.length > 0),
-
-    // Actions (Functions)
     fetchMatches,
     setInitialCandidates,
-    getCurrentMatch,
-    removeCurrentMatch, // Added explicit removal action
+    removeCandidateById, // Новое действие
     processLike,
+    // processDislike, // Если есть
     acceptMatch,
   }
 });

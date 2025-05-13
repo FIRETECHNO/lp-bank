@@ -60,6 +60,15 @@ const userStore = useAuth();
             </div>
           </v-col>
         </v-row>
+
+        <v-row>
+          <v-col cols="12">
+            <h1>Возможные партнеры</h1>
+          </v-col>
+          <v-col cols="12">
+            <CandidatesList />
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
   </v-container>
