@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useNuxtApp } from '#app'; // Import to access injected $api
+import type { UserForList } from "~/types/user-for-list.interface";
 import type { User } from "~/types/user.interface";
 import { useAuth } from "./auth"; // Assuming your auth store path
 
@@ -9,8 +10,7 @@ import { useAuth } from "./auth"; // Assuming your auth store path
 
 export const useMatching = defineStore('matching', () => {
   // === State ===
-  const candidates = ref<User[]>([]);
-  const sentRequests = ref<any[]>([]); // Определите тип, если возможно
+  const candidates = ref<UserForList[]>([]);
   const isLoadingMatches = ref(false);
   const errorLoadingMatches = ref<Error | null>(null);
 
@@ -23,12 +23,28 @@ export const useMatching = defineStore('matching', () => {
 
     isLoadingMatches.value = true;
     errorLoadingMatches.value = null;
+    const { user } = useAuth();
     console.log("Fetching matches...");
 
-    try {
-      let fetchedUsers: User[] | null = await $apiFetch<User[]>('/matching/get-matches', { method: 'GET' })
+    if (!user?._id) {
+      isLoadingMatches.value = false;
+      errorLoadingMatches.value = new Error("Вы не авторизованы");
+      console.error("Error fetching matches:", "Вы не авторизованы");
+    }
 
-      candidates.value = fetchedUsers ?? [];
+    try {
+      let fetchedUsers: User[] | null = await $apiFetch<User[]>('/matching/get-matches', {
+        method: 'POST',
+        body: {
+          currentUserId: user?._id
+        }
+      })
+
+      candidates.value = fetchedUsers.map((obj: User) => {
+        let res = { ...obj, isLiked: false }
+        return res;
+      }) ?? [];
+
       console.log("Matches fetched: ", candidates.value);
     } catch (error: any) {
       errorLoadingMatches.value = error;
@@ -38,7 +54,7 @@ export const useMatching = defineStore('matching', () => {
     }
   }
 
-  function setInitialCandidates(initialData: User[] | null) {
+  function setInitialCandidates(initialData: UserForList[] | null) {
     if (initialData) {
       candidates.value = initialData;
       console.log("Initial candidates set:", candidates.value);
@@ -69,10 +85,15 @@ export const useMatching = defineStore('matching', () => {
     try {
       const response = await $api.processLike(likedUserId, authStore.user._id);
       console.log("Like response:", response);
+
       if (response.success) {
-        // Опционально: удалить из списка локально для мгновенного UI-отклика
-        // removeCandidateById(likedUserId); // Уже делается в компоненте
+        for (let i = 0; i < candidates.value.length; i++) {
+          if (candidates.value[i]._id == likedUserId) {
+            candidates.value[i].isLiked = true;
+          }
+        }
       }
+
       return response.success;
     } catch (error) {
       console.error("Error processing like:", error);
@@ -115,7 +136,6 @@ export const useMatching = defineStore('matching', () => {
 
   return {
     candidates,
-    sentRequests,
     isLoadingMatches,
     errorLoadingMatches,
     fetchMatches,
