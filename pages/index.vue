@@ -32,8 +32,8 @@ const userStore = useAuth();
             <div class="card border">
               <v-row>
                 <v-col cols="12">
-                  <p class="text-h5 font-weight-bold">Найдите партнера для изучения</p>
-                  <p class="text-caption text-color-gray">Общайтесь и учитесь вместе с другими пользователями</p>
+                  <p class="text-h5 font-weight-bold">Найди партнера для изучения</p>
+                  <p class="text-caption text-color-gray">Общайся и учись вместе с другими пользователями</p>
                 </v-col>
                 <v-col cols="12" class="d-flex justify-center" style="font-size: 50px;;">
                   <v-icon color="primary">mdi-account-multiple-outline</v-icon>
@@ -48,8 +48,8 @@ const userStore = useAuth();
             <div class="card border">
               <v-row>
                 <v-col cols="12">
-                  <p class="text-h5 font-weight-bold">Ваши сообщения</p>
-                  <p class="text-caption text-color-gray">Общайтесь и учитесь вместе с другими пользователями</p>
+                  <p class="text-h5 font-weight-bold">Твои сообщения</p>
+                  <p class="text-caption text-color-gray">Общайся и учись вместе с другими пользователями</p>
                 </v-col>
                 <v-col cols="12" class="d-flex justify-center" style="font-size: 50px;;">
                   <v-icon color="success">mdi-message</v-icon>
@@ -64,7 +64,7 @@ const userStore = useAuth();
             <div class="card border">
               <v-row>
                 <v-col cols="12">
-                  <p class="text-h5 font-weight-bold">Заполните анкету</p>
+                  <p class="text-h5 font-weight-bold">Заполни анкету</p>
                   <p class="text-caption text-color-gray">Это поможет найти вам самый подходящий метч</p>
                 </v-col>
                 <v-col cols="12" class="d-flex justify-center" style="font-size: 50px;;">
