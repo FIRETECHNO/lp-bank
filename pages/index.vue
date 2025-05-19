@@ -47,7 +47,7 @@ const userStore = useAuth();
             <div class="card border">
               <v-row>
                 <v-col cols="12">
-                  <h2>Заполните анекту</h2>
+                  <h2>Заполните анкету</h2>
                   <p class="text-caption text-color-gray">Это поможет найти вам самый подходящий метч</p>
                 </v-col>
                 <v-col cols="12" class="d-flex justify-center" style="font-size: 50px;;">
