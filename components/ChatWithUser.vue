@@ -12,7 +12,7 @@ let currentUser = () => {
 
 </script>
 <template>
-  <div @click="emit('joinRoom', chat?._id)">
+  <div @click="emit('joinRoom', chat?._id)" class="cursor-pointer">
     <v-avatar color="surface-variant">{{ currentUser().name[0] }}</v-avatar>
     {{ currentUser().name }}
     {{ currentUser().surname }}

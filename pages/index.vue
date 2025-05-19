@@ -22,7 +22,7 @@ const userStore = useAuth();
                   <v-icon color="primary">mdi-account-multiple-outline</v-icon>
                 </v-col>
                 <v-col cols="12">
-                  <v-btn block color="primary" to="/matching">Найти пару</v-btn>
+                  <v-btn block color="primary" to="#candidates-list">Найти пару</v-btn>
                 </v-col>
               </v-row>
             </div>
@@ -61,7 +61,7 @@ const userStore = useAuth();
           </v-col>
         </v-row>
 
-        <v-row>
+        <v-row id="candidates-list">
           <v-col cols="12">
             <h1>Возможные партнеры</h1>
           </v-col>

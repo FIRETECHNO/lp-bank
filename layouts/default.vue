@@ -5,12 +5,12 @@
       <v-container>
         <v-row class="d-flex justify-center align-center">
           <v-col cols="12" md="11" xl="10" class="d-flex justify-space-between align-center">
-            <v-btn to="/">home</v-btn>
+            <v-btn to="/">Главная</v-btn>
 
             <v-spacer></v-spacer>
 
-            <v-btn icon="mdi-account-heart-outline" to="/matches"></v-btn>
-            <v-btn icon="mdi-chat-outline" to="/chats"></v-btn>
+            <v-btn append-icon="mdi-account-heart-outline" to="/matches">заявки</v-btn>
+            <v-btn append-icon="mdi-chat-outline" to="/chats">чаты</v-btn>
             <v-btn icon="mdi-account" to="/me"></v-btn>
           </v-col>
         </v-row>
