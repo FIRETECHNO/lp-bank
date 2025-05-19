@@ -32,6 +32,32 @@ async function acceptMatch(match: any) {
   closeAcceptMatchDialog()
 }
 
+function getAge(age: number): string {
+  if (age == 0) return "не указан";
+  let txt;
+  let count = age % 100; // Получаем последние две цифры
+
+  if (count >= 11 && count <= 19) { // Для чисел от 11 до 19 всегда "лет"
+    txt = 'лет';
+  } else {
+    count = age % 10; // Получаем последнюю цифру
+    if (count === 1) {
+      txt = 'год';
+    } else if (count >= 2 && count <= 4) {
+      txt = 'года';
+    } else {
+      txt = 'лет';
+    }
+  }
+  return age + " " + txt;
+}
+
+function getGender(gender: string): string {
+  if (gender == "" || !gender) return "не указан"
+  return gender === 'male' ? 'Мужской' : gender === 'female' ?
+    'Женский' :
+    gender;
+}
 
 await userStore.populateMatches();
 </script>
@@ -60,7 +86,24 @@ await userStore.populateMatches();
                   <div class="match-name">
                     {{ matchToShow.sender.name }} {{ matchToShow.sender.surname }}
                   </div>
-                  {{ matchToShow }}
+                  <v-col cols="12" v-if="matchToShow.sender?.idealPartnerDescription">
+                    {{ matchToShow.sender?.idealPartnerDescription }}
+                  </v-col>
+                  <v-col cols="12">
+                    <div class="my-1">
+                      <strong>Возраст:</strong> {{ getAge(matchToShow.sender?.age ?? 0) }}
+                    </div>
+                    <div class="my-1">
+                      <strong>Пол:</strong> {{ getGender(matchToShow.sender?.gender ?? "") }}
+                    </div>
+                    <div class="my-1 d-flex">
+                      <strong>Уровень языка:</strong>
+                      <div class="cursor-pointer ml-1">
+                        {{ matchToShow.sender.langLevel?.name || "не указан" }}
+                      </div>
+                    </div>
+                    {{ matchToShow.sender.langLevel?.description }}
+                  </v-col>
                 </v-card-text>
                 <v-card-actions class="d-flex justify-space-around">
                   <v-btn color="error" @click="rejectMatch(matchToShow)">отклонить</v-btn>

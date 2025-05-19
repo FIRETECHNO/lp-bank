@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: ["auth"]
+})
+
 import { toast } from "vue3-toastify"
 
 // Типизация для ссылок на компоненты, чтобы вызывать validate
