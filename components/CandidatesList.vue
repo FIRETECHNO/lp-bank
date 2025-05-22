@@ -124,9 +124,9 @@ function getGender(gender: string): string {
         <v-col cols="12" xl="6" v-for="(candidate) of matchStore.candidates" :key="candidate._id">
           <div class="card border">
 
-            <v-btn icon variant="flat" :color="candidate.isLiked ? 'pink-lighten-1' : 'pink-lighten-1'"
-              density="comfortable" class="like-button-top-right" :disabled="candidate.isLiked"
-              @click.stop="handleLike(candidate._id)" aria-label="Лайкнуть">
+            <v-btn icon variant="flat" :color="candidate.isLiked ? 'grey' : 'secondary2'" density="comfortable"
+              class="like-button-top-right" :disabled="candidate.isLiked" @click.stop="handleLike(candidate._id)"
+              aria-label="Лайкнуть">
               <v-icon size="small">mdi-heart</v-icon>
               <v-tooltip activator="parent" location="bottom">Познакомиться</v-tooltip>
             </v-btn>
