@@ -36,7 +36,8 @@ export const useMatching = defineStore('matching', () => {
       let fetchedUsers: User[] | null = await $apiFetch<User[]>('/matching/get-matches', {
         method: 'POST',
         body: {
-          currentUserId: user?._id
+          currentUserId: user?._id,
+          partnerFilters: user?.partnerFilters ?? null
         }
       })
 

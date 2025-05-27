@@ -8,6 +8,7 @@ definePageMeta({
 });
 
 const route = useRoute();
+const router = useRouter();
 const userStore = useAuth();
 const roomId = computed(() => route.params.roomId as string);
 
@@ -71,6 +72,26 @@ const isMyMessage = (msg: DisplayMessage): boolean => {
   return msg.senderId._id === userStore.user._id;
 };
 
+// function createTelemostLink() {
+//   try {
+//     useFetch("https://cloud-api.yandex.net/v1/telemost-api/conferences", {
+//       "headers": {
+//         "Authorization": "OAuth y0__xDv3IW6Axjx-Tcg7ZLGnxM_aPsKhAVBV_mShiJqd3U-H9BiUQ",
+//         "Content-Type": "application/json"
+//       },
+//       "method": "POST",
+//       "body": {}
+//     })
+//   } catch (error) {
+//     console.log(error);
+
+//   }
+// }
+
+function goToTelemost() {
+  window.open("https://telemost.yandex.ru/")
+}
+
 // --- Auto Scroll ---
 watch(messages, async () => {
   // Wait for the DOM to update after messages array changes
@@ -87,10 +108,11 @@ fetchChatDetails()
 <template>
   <div class="chat-container">
     <h1>{{ getChatName }}</h1>
-
+    <div class="d-flex justify-center mb-2">
+      <v-btn variant="tonal" prepend-icon="mdi-calendar" @click="goToTelemost">начать встречу</v-btn>
+    </div>
     <!-- Status indicators -->
-    <div class="status-container">
-      <!-- ... status divs ... -->
+    <!-- <div class="status-container">
       <div v-if="isConnecting" class="status connecting">
         Статус: Подключение...
       </div>
@@ -103,7 +125,7 @@ fetchChatDetails()
       <div v-else class="status disconnected">
         Статус: Отключено
       </div>
-    </div>
+    </div> -->
 
     <!-- Loading / Error States -->
     <div v-if="isLoadingHistory" class="loading-indicator">

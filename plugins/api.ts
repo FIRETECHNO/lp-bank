@@ -26,7 +26,7 @@ export default defineNuxtPlugin(() => {
           console.log('[onResponseError] Skipping toast on server.');
         }
       }
-      if (response.status === 401) {
+      if (response.status === 401 && response.url.startsWith("https://uchivrit")) {
         useState('authRedirect').value = useRoute().path;
         navigateTo('/login');
       }
