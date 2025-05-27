@@ -13,6 +13,8 @@ interface ValidatableComponent {
 const userStore = useAuth();
 const router = useRouter();
 
+const { user } = userStore;
+
 const step = ref<number>(1);
 
 // Ссылки на компоненты шагов
@@ -28,7 +30,6 @@ const formData = reactive({
 // Функция для обновления данных конкретного шага
 function updateStepData(stepName: 'personal' | 'partnerFilters', data: any) {
   formData[stepName] = data;
-  console.log('Updated formData:', formData);
 }
 
 async function nextStep() {
@@ -54,6 +55,21 @@ function prevStep() {
   }
 }
 
+function setUserData() {
+  updateStepData('personal', {
+    gender: user?.gender,
+    langLevel: user?.langLevel,
+    age: user?.age,
+    idealPartnerDescription: user?.idealPartnerDescription
+  })
+  updateStepData('partnerFilters', {
+    langLevel: user?.partnerFilters?.langLevel,
+    minAge: user?.partnerFilters?.minAge,
+    maxAge: user?.partnerFilters?.maxAge,
+    gender: user?.partnerFilters?.gender,
+  })
+}
+
 async function submit() {
   let res = await userStore.updateAboutMe(formData);
   if (res.success) {
@@ -68,6 +84,8 @@ async function submit() {
     // do nothing, cuz all errors are handled in $apiFetch
   }
 }
+
+setUserData()
 </script>
 
 <template>
@@ -76,13 +94,12 @@ async function submit() {
       <v-col cols="12" sm="10" md="7" xl="6">
         <v-window v-model="step">
           <v-window-item :value="1" class="pa-2">
-            <!-- Убедитесь, что AboutMePersonal импортирован или авто-импортирован Nuxt -->
-            <AboutMePersonal ref="personalInfoRef" @update:form-data="data => updateStepData('personal', data)" />
+            <AboutMePersonal ref="personalInfoRef" :init-data="formData.personal"
+              @update:form-data="data => updateStepData('personal', data)" />
           </v-window-item>
 
           <v-window-item :value="2" class="pa-2">
-            <!-- Убедитесь, что AboutMePartnerFilters импортирован или авто-импортирован Nuxt -->
-            <AboutMePartnerFilters ref="partnerFiltersRef"
+            <AboutMePartnerFilters ref="partnerFiltersRef" :init-data="formData.partnerFilters"
               @update:form-data="data => updateStepData('partnerFilters', data)" />
           </v-window-item>
 

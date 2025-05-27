@@ -3,6 +3,9 @@ import { reactive, watch, ref } from 'vue';
 import type { VForm } from 'vuetify/components';
 
 const emit = defineEmits(['update:formData']);
+const props = defineProps<{
+  initData?: any
+}>()
 const formRef = ref<VForm | null>(null);
 
 const form = reactive({
@@ -40,6 +43,26 @@ async function validate() {
     return valid;
   }
   return false;
+}
+
+if (props.initData) {
+  // gender: string,
+  // langLevel: LangLevel,
+  // age: number,
+  // idealPartnerDescription: string
+  const data = props.initData;
+  if (data.gender) {
+    form.gender = data.gender;
+  }
+  if (data.langLevel) {
+    form.langLevel = data.langLevel;
+  }
+  if (data.age) {
+    form.age = data.age;
+  }
+  if (data.idealPartnerDescription) {
+    form.idealPartnerDescription = data.idealPartnerDescription;
+  }
 }
 
 defineExpose({ validate });
