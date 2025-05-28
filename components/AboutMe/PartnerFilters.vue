@@ -88,7 +88,7 @@ defineExpose({ validate });
         </v-col>
         <v-col cols="12">
           Возраст от, до
-          <v-range-slider v-model="ageRange" :max="90" :min="15" :step="1" class="align-center" hide-details>
+          <v-range-slider v-model="ageRange" :max="90" :min="12" :step="1" class="align-center" hide-details>
             <template v-slot:prepend>
               <v-text-field :model-value="ageRange[0]"
                 @update:model-value="val => ageRange = [Number(val), ageRange[1]]" density="compact" style="width: 70px"
