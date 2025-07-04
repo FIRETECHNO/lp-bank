@@ -5,13 +5,15 @@
       <v-container>
         <v-row class="d-flex justify-center align-center">
           <v-col cols="12" md="11" xl="10" class="d-flex justify-space-between align-center">
-            <v-btn to="/">Главная</v-btn>
+            <v-btn to="/">лого</v-btn>
 
             <v-spacer></v-spacer>
 
-            <v-btn append-icon="mdi-account-heart-outline" to="/matches">заявки</v-btn>
-            <v-btn append-icon="mdi-chat-outline" to="/chats">чаты</v-btn>
-            <v-btn icon="mdi-account" to="/me"></v-btn>
+            <NuxtLink to="tel:89127528877">
+              <v-btn prepend-icon="mdi-phone">89127528877</v-btn>
+            </NuxtLink>
+
+            <v-btn append-icon="mdi-account" to="/login">войти</v-btn>
           </v-col>
         </v-row>
       </v-container>
