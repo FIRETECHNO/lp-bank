@@ -18,7 +18,9 @@
     </v-app-bar>
 
     <v-main>
-      <slot /> <!-- This is where your page content will be rendered -->
+      <v-container>
+        <slot /> <!-- This is where your page content will be rendered -->
+      </v-container>
     </v-main>
 
     <v-footer app>
