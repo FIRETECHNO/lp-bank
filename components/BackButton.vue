@@ -36,7 +36,7 @@ function goTo() {
     <div class="d-flex cursor-pointer ma-2" @click="goTo">
       <v-icon>mdi-chevron-left</v-icon>
 
-      <div class="text-body-4 ml-1 font-semibold">{{ buttonText ? buttonText : "Вернуться назад" }}</div>
+      <div class="text-body-4 ml-1 font-semibold">{{ buttonText ? buttonText : "Вернуться" }}</div>
     </div>
   </div>
 </template>

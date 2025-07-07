@@ -21,6 +21,7 @@ const email = useField('email')
 const password = useField('password')
 let show_password = ref(false)
 
+let selectionDialog = ref(false)
 let loading = ref(false)
 
 const login = handleSubmit(async values => {
@@ -33,7 +34,11 @@ const login = handleSubmit(async values => {
     router.push(`/`)
   }
 })
-
+function openRegistration(role: string, toggle: any) {
+  toggle()
+  setTimeout(() =>
+    router.push(`/${role}-registration`), 300)
+}
 </script>
 <template>
   <v-container class="align-start">
@@ -55,7 +60,7 @@ const login = handleSubmit(async values => {
           <v-btn type="submit" :disabled="!meta.valid" color="accent" class="mt-4">Войти</v-btn>
         </v-form>
 
-        <div @click="router.push('/registration')" :loading="loading"
+        <div @click="selectionDialog = !selectionDialog"
           class="text-body-2 w-100 cursor-pointer font-weight-semibold pa-1 mt-4">
           регистрация
         </div>
@@ -64,6 +69,33 @@ const login = handleSubmit(async values => {
         </div> -->
       </v-card>
     </v-col>
+    <v-dialog v-model="selectionDialog" class="" width="auto">
+      <v-card title="Как вы хотите зарегистрироваться?" max-width="600">
+        <v-item-group mandatory>
+          <v-container>
+            <v-row>
+              <v-col v-for="(role, index) in [
+                { key: 'parent', name: 'Родитель' },
+                {
+                  key: 'teacher', name: 'Репетитор'
+                }]" :key="index" cols="12" md="6">
+                <v-item v-slot="{ isSelected, toggle }">
+                  <v-card :color="isSelected ? 'primary' : ''" class="d-flex align-center justify-center" height="150"
+                    dark @click="openRegistration(role.key, toggle)">
+                    <v-scroll-y-transition>
+                      <div class="text-h4 flex-grow-1 text-center ma-2">
+                        {{ role.name }}
+                      </div>
+                    </v-scroll-y-transition>
+                  </v-card>
+                </v-item>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-item-group>
+      </v-card>
+
+    </v-dialog>
   </v-container>
 </template>
 
