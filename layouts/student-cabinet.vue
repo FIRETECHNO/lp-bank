@@ -1,6 +1,6 @@
 <script setup lang="ts"></script>
 <template>
-  <v-app full-height>
+  <v-app>
     <v-app-bar :elevation="0" class="border">
       <v-container>
         <v-row class="d-flex justify-center align-center">
@@ -25,9 +25,9 @@
       </v-container>
     </v-main>
 
-    <v-footer class="d-flex justify-center align-end">
+    <v-footer>
       <v-container>
-        <v-row class="d-flex justify-center">
+        <v-row class="d-flex justify-center align-center">
           <v-col cols="12" md="11" xl="10" class="d-flex">
             <v-row>
               <v-col cols="6">
