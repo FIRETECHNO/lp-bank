@@ -72,7 +72,7 @@ const submit = handleSubmit(async values => {
   loading.value = true
 
   let success = await auth.registration(Object.assign(values, {
-    roles: ["user"],
+    roles: [route.params?.role ?? "user"],
   }))
 
   if (success) {
