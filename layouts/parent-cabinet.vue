@@ -8,7 +8,7 @@ let navigationItems = ref([
   {
     icon: "mdi-cart",
     text: "Покупки",
-    route: "/parent/history"
+    route: "/parent/orders"
   },
   {
     icon: "mdi-bell",
