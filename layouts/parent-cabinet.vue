@@ -27,7 +27,7 @@ let navigationItems = ref([
           <v-col cols="12" md="11" xl="10">
             <v-list nav lines="one" class="d-flex" variant="tonal">
               <v-list-item v-for="(item, index) of navigationItems" :key="index" color="primary" :to="item.route"
-                style="border-radius: 20px;" class="ma-1">
+                style="border-radius: 12px;" class="ma-1">
                 <v-list-item-title class="text-subtitle-1	font-weight-medium d-flex align-center">
                   <v-icon :icon="item.icon" class="mr-3"></v-icon>
                   {{ item.text }}
