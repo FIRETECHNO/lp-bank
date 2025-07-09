@@ -5,6 +5,9 @@ let isAuth = computed(() => {
   if (authStore.user?._id) return true;
   return false;
 })
+let cabinetRoute = computed<string>(() => {
+  return `/${authStore?.role}/me`
+})
 </script>
 <template>
   <v-app-bar :elevation="0" class="border">
@@ -20,7 +23,7 @@ let isAuth = computed(() => {
           </NuxtLink>
 
           <v-btn v-if="!isAuth" append-icon="mdi-login" to="/login">войти</v-btn>
-          <v-btn v-else append-icon="mdi-account-outline" to="/me">
+          <v-btn v-else append-icon="mdi-account-outline" :to="cabinetRoute">
             кабинет
           </v-btn>
         </v-col>

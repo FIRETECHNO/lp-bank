@@ -70,13 +70,13 @@ let loading = ref(false)
 
 const submit = handleSubmit(async values => {
   loading.value = true
-
+  let mainRole = route.params?.role ?? "user";
   let success = await auth.registration(Object.assign(values, {
-    roles: [route.params?.role ?? "user"],
+    roles: [mainRole],
   }))
 
   if (success) {
-    router.push("/me");
+    router.push(`/${mainRole}/me`);
   }
 
   loading.value = false

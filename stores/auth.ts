@@ -1,12 +1,20 @@
 import { defineStore } from "pinia"
 import AuthAPI from "../api/AuthApi"
 
-import type { User } from "../types/user.interface"
+import type { User, Role } from "../types/user.interface"
+
 import { ref, computed } from "vue"
 import MatchApi from "~/api/MatchApi"
 
+
 export const useAuth = defineStore('auth', () => {
   let user = ref<User | null>()
+
+  let role = computed<Role>(() => {
+    if (user.value?.roles.includes("student" as unknown as Role)) return "student" as unknown as Role
+    if (user.value?.roles.includes("parent" as unknown as Role)) return "parent" as unknown as Role
+    return (user.value?.roles[0] ?? "user") as unknown as Role
+  })
 
   async function registration(data: any): Promise<boolean> {
     try {
@@ -167,7 +175,7 @@ export const useAuth = defineStore('auth', () => {
 
   return {
     // variables
-    user,
+    user, role,
     // functions
     registration, login, checkAuth, logout,
     updateUser, sendResetLink, resetPassword,
