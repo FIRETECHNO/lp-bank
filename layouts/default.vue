@@ -1,4 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const authStore = useAuth();
+
+let isAuth = computed(() => {
+  if (authStore.user?._id) return true;
+  return false;
+})
+</script>
 <template>
   <v-app full-height>
     <v-app-bar :elevation="0" class="border">
@@ -13,7 +20,10 @@
               <v-btn prepend-icon="mdi-phone">89127528877</v-btn>
             </NuxtLink>
 
-            <v-btn append-icon="mdi-account" to="/login">войти</v-btn>
+            <v-btn v-if="!isAuth" append-icon="mdi-login" to="/login">войти</v-btn>
+            <v-btn v-else append-icon="mdi-account-outline" to="/me">
+              кабинет
+            </v-btn>
           </v-col>
         </v-row>
       </v-container>

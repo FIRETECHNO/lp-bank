@@ -8,33 +8,6 @@ import MatchApi from "~/api/MatchApi"
 export const useAuth = defineStore('auth', () => {
   let user = ref<User | null>()
 
-  let receivedMatches = computed(() => {
-    // if matches are not populated or not presented
-    if (typeof (user.value?.matches[0]) == "string" || !user.value?.matches) return []
-    let result = [];
-
-    for (let match of user.value.matches) {
-      if (match.receiver._id === user.value._id) {
-        result.push(match)
-      }
-    }
-
-    return result;
-  })
-
-  let sentMatches = computed(() => {
-    // if matches are not populated or not presented
-    if (typeof (user.value?.matches[0]) == "string" || !user.value?.matches) return []
-    let result = [];
-    for (let match of user.value.matches) {
-      if (match.sender._id === user.value._id) {
-        result.push(match)
-      }
-    }
-
-    return result;
-  })
-
   async function registration(data: any): Promise<boolean> {
     try {
       const response = await AuthAPI.registration(data)
@@ -50,18 +23,6 @@ export const useAuth = defineStore('auth', () => {
     }
   }
 
-
-  async function registerStudent(user: any): Promise<boolean> {
-    try {
-      const response = await AuthAPI.registerStudent(user)
-      if (response.data.value) {
-        console.log(response);
-      }
-      return true
-    } catch {
-      return false
-    }
-  }
 
   async function login(email: string, password: string) {
     try {
@@ -191,16 +152,6 @@ export const useAuth = defineStore('auth', () => {
       user.value.surname == other.surname;
   }
 
-  async function populateMatches() {
-    if (!user.value?._id) return;
-
-    let result = await MatchApi.populateMatches(user.value?._id);
-
-    if (result != null) {
-      user.value.matches = result.matches;
-    }
-  }
-
   async function updateAboutMe(data: { personal?: any, partnerFilters?: any }): Promise<{ success: boolean }> {
     if (!user.value?._id)
       return { success: false };
@@ -216,10 +167,10 @@ export const useAuth = defineStore('auth', () => {
 
   return {
     // variables
-    user, receivedMatches, sentMatches,
+    user,
     // functions
     registration, login, checkAuth, logout,
-    updateUser, sendResetLink, resetPassword, registerStudent,
-    getAllUsers, uploadAvatar, Equals, populateMatches, updateAboutMe
+    updateUser, sendResetLink, resetPassword,
+    getAllUsers, uploadAvatar, Equals, updateAboutMe
   }
 })
