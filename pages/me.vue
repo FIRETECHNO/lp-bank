@@ -13,7 +13,6 @@ const user = computed<User | null>(() => authStore.user as User | null);
 function formatLangLevels(levels: LangLevel[] | undefined): string {
   if (!levels || levels.length === 0) return "Не указано";
   return levels.map((level) => level.name).join(", ");
-  if(true)
 }
 
 function formatGender(genderKey?: string): string {
