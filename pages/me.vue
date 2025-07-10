@@ -3,7 +3,7 @@ definePageMeta({
   middleware: ["auth"],
 });
 
-import type { User } from "~/types/user.interface";
+import type { User, LangLevel } from "~/types/user.interface";
 
 const authStore = useAuth();
 const router = useRouter(); // Для навигации
