@@ -9,6 +9,8 @@ const router = useRouter()
 const route = useRoute()
 const auth = useAuth();
 
+let personalDataAgreement = ref<boolean>(false)
+
 let registrationName = computed(() => {
   if (route.params?.role == "teacher") return "Регистрация Репетитора"
   if (route.params?.role == "parent") return "Регистрация Родителя"
@@ -18,11 +20,14 @@ let registrationName = computed(() => {
 const { meta, handleSubmit, handleReset, validate } = useForm<{
   name: string,
   surname: string,
+  phone: string,
   email: string,
   password: string,
 }>({
   initialValues: {
     name: '',
+    surname: '',
+    phone: '',
     email: '',
     password: '',
   },
@@ -40,6 +45,14 @@ const { meta, handleSubmit, handleReset, validate } = useForm<{
       if (value.length > 22) return 'слишком длинная фамилия'
 
       return true
+    },
+    phone(value: string) {
+      if (!value || value.length === 0) return 'введите номер телефона';
+      const cleaned = value.replace(/[^\d+]/g, '');
+      if (!/^(\+7|8)\d{10}$/.test(cleaned)) {
+        return 'неверный формат номера';
+      }
+      return true;
     },
     email(value: string) {
       if (!value || value.length === 0) return 'введите почту'
@@ -60,11 +73,15 @@ const { meta, handleSubmit, handleReset, validate } = useForm<{
 
 let name = useField<string>('name')
 let surname = useField<string>('surname')
+let phone = useField<string>('phone') 
 let email = useField<string>('email')
 let password = useField<string>('password')
 
 let show_password = ref(false)
 
+let isFormValid = computed(() => {
+  return personalDataAgreement.value && meta.value.valid
+})
 
 let loading = ref(false)
 
@@ -104,6 +121,9 @@ const submit = handleSubmit(async values => {
             <v-text-field label="Фамилия" type="surname" placeholder="Иванов" v-model="surname.value.value"
               :error-messages="surname.errors.value" variant="outlined" density="compact" class="w-100" />
 
+            <v-text-field label="Номер телефона" type="tel" placeholder="+7 (999) 123-45-67" v-model="phone.value.value"
+              :error-messages="phone.errors.value" variant="outlined" density="compact" class="w-100 mt-1" />
+
             <v-text-field label="Email" type="email" placeholder="vasya@ya.ru" v-model="email.value.value"
               :error-messages="email.errors.value" variant="outlined" density="compact" class="w-100 mt-1" />
 
@@ -111,8 +131,10 @@ const submit = handleSubmit(async values => {
               :append-inner-icon="show_password ? 'mdi-eye' : 'mdi-eye-off'"
               @click:append-inner="show_password = !show_password" :type="show_password ? 'text' : 'password'"
               :error-messages="password.errorMessage.value" variant="outlined" density="compact" class="w-100 mt-1" />
+            
+            <v-checkbox v-model="personalDataAgreement" label="Согласие на обработку персональных данных"></v-checkbox>
 
-            <v-btn type="submit" :disabled="!meta.valid" :loading="loading" color="accent" class="mt-6">
+            <v-btn type="submit" :disabled="!isFormValid" :loading="loading" color="accent" class="mt-6">
               Отправить
             </v-btn>
           </v-form>
