@@ -280,7 +280,7 @@ const hasPartnerFilters = computed(() => {
                   variant="text"
                   size="small"
                   color="primary"
-                  @click="router.push('/about-me-form')"
+                  to="/student-registration"
                   class="ml-2"
                   >Добавить</v-btn
                 >
