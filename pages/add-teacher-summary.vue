@@ -27,10 +27,10 @@ const items = [
 ];
 
 const expirienceTypes = ["до 1 года", "от 1 до 2 лет", "2-4 года", "4+ года"];
-let educationLevel = ref<String>("");
-let expirience = ref<String>("");
-let achievements = ref<String>("");
-let aboutMe = ref<String>("");
+let educationLevel = ref<string>("");
+let expirience = ref<string>("");
+let achievements = ref<string>("");
+let aboutMe = ref<string>("");
 
 function submit() {
   console.log(educationLevel, expirience, achievements, aboutMe);
