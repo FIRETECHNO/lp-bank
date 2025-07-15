@@ -39,24 +39,24 @@ async function handleLogout() {
 }
 
 const hasPersonalInfo = computed(() => {
-  return (
-    user.value &&
-    (user.value.gender ||
-      user.value.age ||
-      user.value.langLevel ||
-      user.value.idealPartnerDescription)
-  );
+  return //(
+     user.value //&&
+  //   (user.value.gender ||
+  //     user.value.age ||
+  //     user.value.langLevel ||
+  //     user.value.idealPartnerDescription)
+  // );
 });
 
 const hasPartnerFilters = computed(() => {
-  return (
-    user.value &&
-    user.value.partnerFilters &&
-    (user.value.partnerFilters.gender ||
-      (user.value.partnerFilters.minAge && user.value.partnerFilters.maxAge) ||
-      (user.value.partnerFilters.langLevel &&
-        user.value.partnerFilters.langLevel.length > 0))
-  );
+  return //(
+     user.value //&&
+  //   user.value.partnerFilters &&
+  //   (user.value.partnerFilters.gender ||
+  //     (user.value.partnerFilters.minAge && user.value.partnerFilters.maxAge) ||
+  //     (user.value.partnerFilters.langLevel &&
+  //       user.value.partnerFilters.langLevel.length > 0))
+  // );
 });
 </script>
 

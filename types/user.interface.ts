@@ -3,10 +3,10 @@ export interface Role {
 }
 
 export interface TeacherSummary {
-  educationLevel: string
-  experience: string
-  achievements: string
-  aboutMe: string
+  educationLevel: string;
+  experience: string;
+  achievements: string;
+  aboutMe: string;
 }
 
 export interface User {
@@ -17,4 +17,10 @@ export interface User {
   email: string;
   password: string;
   roles: Role[];
+
+  //Teacher info
+  educationLevel?: string;
+  experience?: string;
+  achievements?: string;
+  aboutMe?: string;
 }

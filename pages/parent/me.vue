@@ -10,13 +10,7 @@ const router = useRouter();
 //let user = authStore.user;
 const user = computed<User | null>(() => authStore.user as User | null);
 const hasPersonalInfo = computed(() => {
-  return (
-    user.value &&
-    (user.value.gender ||
-      user.value.age ||
-      user.value.langLevel ||
-      user.value.idealPartnerDescription)
-  );
+  return user.value;
 });
 function formatLangLevels(levels: LangLevel[] | undefined): string {
   if (!levels || levels.length === 0) return "Не указано";
@@ -46,14 +40,12 @@ async function handleLogout() {
   }
 }
 const hasPartnerFilters = computed(() => {
-  return (
-    user.value &&
-    user.value.partnerFilters &&
-    (user.value.partnerFilters.gender ||
-      (user.value.partnerFilters.minAge && user.value.partnerFilters.maxAge) ||
-      (user.value.partnerFilters.langLevel &&
-        user.value.partnerFilters.langLevel.length > 0))
-  );
+  return user.value; //&&
+  // user.value.partnerFilters &&
+  // (user.value.partnerFilters.gender ||
+  //   (user.value.partnerFilters.minAge && user.value.partnerFilters.maxAge) ||
+  //   (user.value.partnerFilters.langLevel &&
+  //     user.value.partnerFilters.langLevel.length > 0))
 });
 </script>
 <template>
@@ -123,25 +115,25 @@ const hasPartnerFilters = computed(() => {
           <v-card flat color="transparent">
             <v-card-text class="pa-0">
               <div v-if="hasPersonalInfo" class="profile-grid">
-                <div v-if="user.gender" class="profile-grid-item">
+                <!-- <div v-if="user.gender" class="profile-grid-item">
                   <div class="text-subtitle-2 text-grey-darken-2">Пол</div>
                   <div class="text-body-1 text-grey-darken-4">
                     {{ formatGender(user.gender) }}
                   </div>
-                </div>
-                <div v-if="user.age" class="profile-grid-item">
+                </div> -->
+                <!-- <div v-if="user.age" class="profile-grid-item">
                   <div class="text-subtitle-2 text-grey-darken-2">Возраст</div>
                   <div class="text-body-1 text-grey-darken-4">
                     {{ user.age }}
                   </div>
-                </div>
+                </div> -->
                 <div v-if="user.phone" class="profile-grid-item">
                   <div class="text-subtitle-2 text-grey-darken-2">Телефон</div>
                   <div class="text-body-1 text-grey-darken-4">
                     {{ user.phone }}
                   </div>
                 </div>
-                <div v-if="user.langLevel" class="profile-grid-item">
+                <!-- <div v-if="user.langLevel" class="profile-grid-item">
                   <div class="text-subtitle-2 text-grey-darken-2">
                     Мой уровень языка
                   </div>
@@ -151,8 +143,8 @@ const hasPartnerFilters = computed(() => {
                       >({{ user.langLevel.description }})</span
                     >
                   </div>
-                </div>
-                <div
+                </div> -->
+                <!-- <div
                   v-if="user.idealPartnerDescription"
                   class="profile-grid-item full-width"
                 >
@@ -165,7 +157,7 @@ const hasPartnerFilters = computed(() => {
                   >
                     {{ user.idealPartnerDescription }}
                   </p>
-                </div>
+                </div> -->
               </div>
               <v-alert
                 v-else
