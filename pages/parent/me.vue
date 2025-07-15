@@ -3,7 +3,7 @@ definePageMeta({
   layout: "parent-cabinet",
 });
 
-import type { User, LangLevel } from "~/types/user.interface";
+import type { User } from "~/types/user.interface";
 const authStore = useAuth();
 const router = useRouter();
 
@@ -12,10 +12,6 @@ const user = computed<User | null>(() => authStore.user as User | null);
 const hasPersonalInfo = computed(() => {
   return user.value;
 });
-function formatLangLevels(levels: LangLevel[] | undefined): string {
-  if (!levels || levels.length === 0) return "Не указано";
-  return levels.map((level) => level.name).join(", ");
-}
 
 function formatGender(genderKey?: string): string {
   if (!genderKey) return "Не указан";
@@ -39,14 +35,6 @@ async function handleLogout() {
     console.error("Ошибка при выходе из системы:", error);
   }
 }
-const hasPartnerFilters = computed(() => {
-  return user.value; //&&
-  // user.value.partnerFilters &&
-  // (user.value.partnerFilters.gender ||
-  //   (user.value.partnerFilters.minAge && user.value.partnerFilters.maxAge) ||
-  //   (user.value.partnerFilters.langLevel &&
-  //     user.value.partnerFilters.langLevel.length > 0))
-});
 </script>
 <template>
   <v-row class="d-flex justify-center">
@@ -115,49 +103,12 @@ const hasPartnerFilters = computed(() => {
           <v-card flat color="transparent">
             <v-card-text class="pa-0">
               <div v-if="hasPersonalInfo" class="profile-grid">
-                <!-- <div v-if="user.gender" class="profile-grid-item">
-                  <div class="text-subtitle-2 text-grey-darken-2">Пол</div>
-                  <div class="text-body-1 text-grey-darken-4">
-                    {{ formatGender(user.gender) }}
-                  </div>
-                </div> -->
-                <!-- <div v-if="user.age" class="profile-grid-item">
-                  <div class="text-subtitle-2 text-grey-darken-2">Возраст</div>
-                  <div class="text-body-1 text-grey-darken-4">
-                    {{ user.age }}
-                  </div>
-                </div> -->
                 <div v-if="user.phone" class="profile-grid-item">
                   <div class="text-subtitle-2 text-grey-darken-2">Телефон</div>
                   <div class="text-body-1 text-grey-darken-4">
                     {{ user.phone }}
                   </div>
                 </div>
-                <!-- <div v-if="user.langLevel" class="profile-grid-item">
-                  <div class="text-subtitle-2 text-grey-darken-2">
-                    Мой уровень языка
-                  </div>
-                  <div class="text-body-1 text-grey-darken-4">
-                    {{ user.langLevel.name }}
-                    <span class="text-caption text-grey-darken-1"
-                      >({{ user.langLevel.description }})</span
-                    >
-                  </div>
-                </div> -->
-                <!-- <div
-                  v-if="user.idealPartnerDescription"
-                  class="profile-grid-item full-width"
-                >
-                  <div class="text-subtitle-2 text-grey-darken-2">
-                    Описание идеального партнера
-                  </div>
-                  <p
-                    class="text-body-1 text-grey-darken-4"
-                    style="white-space: pre-wrap"
-                  >
-                    {{ user.idealPartnerDescription }}
-                  </p>
-                </div> -->
               </div>
               <v-alert
                 v-else
@@ -174,78 +125,6 @@ const hasPartnerFilters = computed(() => {
                   @click="router.push('/about-me-form')"
                   class="ml-2"
                   >Заполнить</v-btn
-                >
-              </v-alert>
-            </v-card-text>
-          </v-card>
-        </section>
-
-        <!-- Секция: Предпочтения по партнеру -->
-        <section>
-          <h2
-            class="text-h5 font-weight-medium mb-4 d-flex align-center text-grey-darken-3"
-          >
-            <v-icon start color="primary">mdi-account-search-outline</v-icon>
-            Предпочтения по партнеру
-          </h2>
-          <v-card flat color="transparent">
-            <v-card-text class="pa-0">
-              <div v-if="hasPartnerFilters" class="profile-grid">
-                <div
-                  v-if="user.partnerFilters?.gender"
-                  class="profile-grid-item"
-                >
-                  <div class="text-subtitle-2 text-grey-darken-2">
-                    Предпочитаемый пол
-                  </div>
-                  <div class="text-body-1 text-grey-darken-4">
-                    {{ formatGender(user.partnerFilters.gender) }}
-                  </div>
-                </div>
-                <div
-                  v-if="
-                    user.partnerFilters?.minAge && user.partnerFilters?.maxAge
-                  "
-                  class="profile-grid-item"
-                >
-                  <div class="text-subtitle-2 text-grey-darken-2">
-                    Предпочитаемый возраст
-                  </div>
-                  <div class="text-body-1 text-grey-darken-4">
-                    От {{ user.partnerFilters.minAge }} до
-                    {{ user.partnerFilters.maxAge }}
-                  </div>
-                </div>
-                <div
-                  v-if="
-                    user.partnerFilters?.langLevel &&
-                    user.partnerFilters.langLevel.length > 0
-                  "
-                  class="profile-grid-item"
-                >
-                  <div class="text-subtitle-2 text-grey-darken-2">
-                    Предпочитаемые уровни языка
-                  </div>
-                  <div class="text-body-1 text-grey-darken-4">
-                    {{ formatLangLevels(user.partnerFilters.langLevel) }}
-                  </div>
-                </div>
-              </div>
-              <v-alert
-                v-else
-                type="info"
-                variant="tonal"
-                density="compact"
-                icon="mdi-information-outline"
-              >
-                Предпочтения по партнеру не указаны.
-                <v-btn
-                  variant="text"
-                  size="small"
-                  color="primary"
-                  @click="router.push('/about-me-form')"
-                  class="ml-2"
-                  >Указать</v-btn
                 >
               </v-alert>
             </v-card-text>

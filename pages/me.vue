@@ -3,17 +3,17 @@ definePageMeta({
   middleware: ["auth"],
 });
 
-import type { User, LangLevel } from "~/types/user.interface";
+import type { User } from "~/types/user.interface";
 
 const authStore = useAuth();
 const router = useRouter(); // Для навигации
 
 const user = computed<User | null>(() => authStore.user as User | null);
 
-function formatLangLevels(levels: LangLevel[] | undefined): string {
-  if (!levels || levels.length === 0) return "Не указано";
-  return levels.map((level) => level.name).join(", ");
-}
+// function formatLangLevels(levels: LangLevel[] | undefined): string {
+//   if (!levels || levels.length === 0) return "Не указано";
+//   return levels.map((level) => level.name).join(", ");
+// }
 
 function formatGender(genderKey?: string): string {
   if (!genderKey) return "Не указан";
@@ -39,8 +39,8 @@ async function handleLogout() {
 }
 
 const hasPersonalInfo = computed(() => {
-  return //(
-     user.value //&&
+  return; //(
+  user.value; //&&
   //   (user.value.gender ||
   //     user.value.age ||
   //     user.value.langLevel ||
@@ -49,8 +49,8 @@ const hasPersonalInfo = computed(() => {
 });
 
 const hasPartnerFilters = computed(() => {
-  return //(
-     user.value //&&
+  return; //(
+  user.value; //&&
   //   user.value.partnerFilters &&
   //   (user.value.partnerFilters.gender ||
   //     (user.value.partnerFilters.minAge && user.value.partnerFilters.maxAge) ||
@@ -117,7 +117,7 @@ const hasPartnerFilters = computed(() => {
         <v-divider class="my-6 my-md-8"></v-divider>
 
         <!-- Секция: Личная информация -->
-        <section class="mb-8">
+        <!--<section class="mb-8">
           <h2
             class="text-h5 font-weight-medium mb-4 d-flex align-center text-grey-darken-3"
           >
@@ -126,7 +126,7 @@ const hasPartnerFilters = computed(() => {
           </h2>
           <v-card flat color="transparent">
             <v-card-text class="pa-0">
-              <div v-if="hasPersonalInfo" class="profile-grid">
+               <div v-if="hasPersonalInfo" class="profile-grid">
                 <div v-if="user.gender" class="profile-grid-item">
                   <div class="text-subtitle-2 text-grey-darken-2">Пол</div>
                   <div class="text-body-1 text-grey-darken-4">
@@ -184,10 +184,10 @@ const hasPartnerFilters = computed(() => {
               </v-alert>
             </v-card-text>
           </v-card>
-        </section>
+        </section> -->
 
         <!-- Секция: Предпочтения по партнеру -->
-        <section>
+        <!-- <section>
           <h2
             class="text-h5 font-weight-medium mb-4 d-flex align-center text-grey-darken-3"
           >
@@ -256,7 +256,7 @@ const hasPartnerFilters = computed(() => {
               </v-alert>
             </v-card-text>
           </v-card>
-        </section>
+        </section> -->
       </v-container>
 
       <v-container
