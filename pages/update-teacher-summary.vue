@@ -1,4 +1,9 @@
 <script lang="ts" setup>
+import type { TeacherSummary } from '~/types/user.interface';
+
+
+const teacherStore = useTeacher()
+
 const items = [
   {
     name: "дошкольное образование",
@@ -28,7 +33,7 @@ const items = [
 
 const experienceTypes = ["до 1 года", "от 1 до 2 лет", "2-4 года", "4+ года"];
 
-let form = ref({
+let form = ref<TeacherSummary>({
   educationLevel: "",
   experience: "",
   achievements: "",
@@ -36,7 +41,8 @@ let form = ref({
 })
 
 function submit() {
-  console.log(form.value);
+  let res = teacherStore.updateTeacherSummary(form.value)
+  // console.log();
 }
 </script>
 
