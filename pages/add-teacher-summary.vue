@@ -26,14 +26,17 @@ const items = [
   },
 ];
 
-const expirienceTypes = ["до 1 года", "от 1 до 2 лет", "2-4 года", "4+ года"];
-let educationLevel = ref<string>("");
-let expirience = ref<string>("");
-let achievements = ref<string>("");
-let aboutMe = ref<string>("");
+const experienceTypes = ["до 1 года", "от 1 до 2 лет", "2-4 года", "4+ года"];
+
+let form = ref({
+  educationLevel: "",
+  experience: "",
+  achievements: "",
+  aboutMe: ""
+})
 
 function submit() {
-  console.log(educationLevel, expirience, achievements, aboutMe);
+  console.log(form.value);
 }
 </script>
 
@@ -42,61 +45,32 @@ function submit() {
     <v-row class="d-flex justify-center align-center fill-height">
       <v-col cols="12" sm="10" md="7" xl="6">
         <span
-          class="d-flex flex-column justify-center align-center text-center rounded-lg w-100 pl-6 pr-6 pt-4 pb-6 text-h4"
-        >
+          class="d-flex flex-column justify-center align-center text-center rounded-lg w-100 pl-6 pr-6 pt-4 pb-6 text-h4">
           Заполните анкету
         </span>
         <v-container>
           <span class="text-h6"> Ваш уровень образования </span>
-          <v-select
-            :items="items"
-            item-title="name"
-            label="Уровень образования"
-            v-model="educationLevel"
-          >
+          <v-select :items="items" item-title="name" label="Уровень образования" v-model="form.educationLevel">
             <template v-slot:item="{ props: itemProps, item }">
-              <v-list-item
-                v-bind="itemProps"
-                :subtitle="item.raw.department"
-              ></v-list-item>
+              <v-list-item v-bind="itemProps" :subtitle="item.raw.department"></v-list-item>
             </template>
           </v-select>
           <span class="text-h6">
-            Ваш опыт работы репетитором или учителем наставником</span
-          >
-          <v-select
-            :items="expirienceTypes"
-            label="Опыт работы"
-            v-model="expirience"
-          >
+            Ваш опыт работы репетитором или учителем наставником</span>
+          <v-select :items="experienceTypes" label="Опыт работы" v-model="form.experience">
           </v-select>
         </v-container>
         <v-container fluid>
           <span class="text-h6"> О вас </span>
-          <v-textarea
-            clear-icon="mdi-close-circle"
-            label="Опишите себя"
-            v-model="aboutMe"
-            clearable
-          ></v-textarea>
+          <v-textarea clear-icon="mdi-close-circle" label="Опишите себя" v-model="form.aboutMe" clearable></v-textarea>
         </v-container>
         <v-container fluid>
           <span class="text-h6"> Ваши достижения </span>
-          <v-textarea
-            clear-icon="mdi-close-circle"
-            label="Опишите свои достижения"
-            v-model="achievements"
-            clearable
-          ></v-textarea>
+          <v-textarea clear-icon="mdi-close-circle" label="Опишите свои достижения" v-model="form.achievements"
+            clearable></v-textarea>
         </v-container>
-        <v-container
-          class="d-flex mt-3 flex-column align-center justify-center w-100"
-        >
-          <v-btn
-            type="submit"
-            class="d-flex justify-center align-center text-center rounded-lg pl-6 pr-6 pt-4 pb-6"
-            @click="submit"
-          >
+        <v-container class="d-flex mt-3 flex-column align-center justify-center w-100">
+          <v-btn type="submit" class="d-flex justify-center align-center text-center rounded-lg" @click="submit">
             Отправить
           </v-btn>
         </v-container>
