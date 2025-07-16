@@ -1,7 +1,8 @@
 <script lang="ts" setup>
+import { toast } from 'vue3-toastify';
 import type { TeacherSummary } from '~/types/user.interface';
 
-
+const router = useRouter();
 const teacherStore = useTeacher()
 
 const items = [
@@ -40,9 +41,20 @@ let form = ref<TeacherSummary>({
   aboutMe: ""
 })
 
-function submit() {
-  let res = teacherStore.updateTeacherSummary(form.value)
-  // console.log();
+async function submit() {
+  let res = await teacherStore.updateTeacherSummary(form.value)
+  if (res.success) {
+    toast("Данные обновлены!", {
+      type: "success",
+      onClose: () => {
+        router.push('/teacher/me')
+      }
+    })
+  } else {
+    toast("Ошибка!", {
+      type: "error"
+    })
+  }
 }
 </script>
 

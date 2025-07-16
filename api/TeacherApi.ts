@@ -1,9 +1,9 @@
 import type { TeacherSummary } from "~/types/user.interface"
 
 export default {
-  updateTeacherSummary(teacherId: string, summary: TeacherSummary): Promise<any> {
+  updateTeacherSummary(teacherId: string, summary: TeacherSummary): Promise<{ success: boolean }> {
     const { $apiFetch } = useNuxtApp();
-    return $apiFetch<any>('/teacher/update-teacher-summary', {
+    return $apiFetch<{ success: boolean }>('/teacher/update-teacher-summary', {
       method: 'POST',
       body: { teacherId, summary }
     });
