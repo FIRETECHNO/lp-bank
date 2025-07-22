@@ -73,7 +73,7 @@ const { meta, handleSubmit, handleReset, validate } = useForm<{
 
 let name = useField<string>('name')
 let surname = useField<string>('surname')
-let phone = useField<string>('phone') 
+let phone = useField<string>('phone')
 let email = useField<string>('email')
 let password = useField<string>('password')
 
@@ -131,7 +131,7 @@ const submit = handleSubmit(async values => {
               :append-inner-icon="show_password ? 'mdi-eye' : 'mdi-eye-off'"
               @click:append-inner="show_password = !show_password" :type="show_password ? 'text' : 'password'"
               :error-messages="password.errorMessage.value" variant="outlined" density="compact" class="w-100 mt-1" />
-            
+
             <v-checkbox v-model="personalDataAgreement" label="Согласие на обработку персональных данных"></v-checkbox>
 
             <v-btn type="submit" :disabled="!isFormValid" :loading="loading" color="accent" class="mt-6">

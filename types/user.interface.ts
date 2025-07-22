@@ -1,6 +1,6 @@
-export interface Role {
-  type: "student" | "teacher" | "parent" | "admin" | "user";
-}
+// export interface Role {
+//   type: ;
+// }
 
 export interface TeacherSummary {
   educationLevel: string;
@@ -16,7 +16,7 @@ export interface User {
   phone: string;
   email: string;
   password: string;
-  roles: Role[];
+  roles: ("student" | "teacher" | "parent" | "admin" | "user")[];
 
   //Teacher info
   educationLevel?: string;

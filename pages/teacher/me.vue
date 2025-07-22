@@ -40,8 +40,7 @@ async function handleLogout() {
   }
 }
 
-function accessReview()
-{
+function accessReview() {
   //if user.value?.roles == 
 }
 
@@ -55,10 +54,7 @@ function accessReview()
           <v-col cols="12" md="auto">
             <div class="d-flex align-center">
               <v-avatar color="primary" variant="tonal" size="64" class="mr-4">
-                <span
-                  class="text-h5 text-primary-darken-2"
-                  v-if="user.name && user.surname"
-                >
+                <span class="text-h5 text-primary-darken-2" v-if="user.name && user.surname">
                   {{ user.name.charAt(0).toUpperCase()
                   }}{{ user.surname.charAt(0).toUpperCase() }}
                 </span>
@@ -75,26 +71,13 @@ function accessReview()
             </div>
           </v-col>
           <v-spacer></v-spacer>
-          <v-col
-            cols="12"
-            md="auto"
-            class="d-flex justify-start justify-md-end mt-4 mt-md-0"
-          >
-            <v-btn
-              variant="outlined"
-              color="grey-darken-2"
-              @click="handleLogout"
-              class="mr-2"
-              prepend-icon="mdi-logout"
-            >
+          <v-col cols="12" md="auto" class="d-flex justify-start justify-md-end mt-4 mt-md-0">
+            <v-btn variant="outlined" color="grey-darken-2" @click="handleLogout" class="mr-2"
+              prepend-icon="mdi-logout">
               Выйти
             </v-btn>
-            <v-btn
-              color="primary"
-              variant="flat"
-              @click="router.push('/about-me-form')"
-              prepend-icon="mdi-pencil-outline"
-            >
+            <v-btn color="primary" variant="flat" @click="router.push('/about-me-form')"
+              prepend-icon="mdi-pencil-outline">
               Редактировать
             </v-btn>
           </v-col>
@@ -104,9 +87,7 @@ function accessReview()
 
         <!-- Секция: Резюме -->
         <section class="mb-8">
-          <h2
-            class="text-h5 font-weight-medium mb-4 d-flex align-center text-grey-darken-3"
-          >
+          <h2 class="text-h5 font-weight-medium mb-4 d-flex align-center text-grey-darken-3">
             <v-icon start color="primary">mdi mdi-account-card-outline</v-icon>
             Резюме
           </h2>
@@ -137,89 +118,47 @@ function accessReview()
                 </div>
               </div>
               <v-card flat color="transparent">
-            <v-card-text class="pa-0">
-              <v-alert
-                type="info"
-                variant="tonal"
-                density="compact"
-                icon="mdi mdi-pencil-outline"
-              >
-              <v-row justify="start">
-                <v-btn
-                  variant="text"
-                  color="primary"
-                  to="/student-registration"
-
-                  >Изменить</v-btn
-                >
-                </v-row>
-              </v-alert>
-            </v-card-text>
-          </v-card>
+                <v-card-text class="pa-0">
+                  <v-alert type="info" variant="tonal" density="compact" icon="mdi mdi-pencil-outline">
+                    <v-row justify="start">
+                      <v-btn variant="text" color="primary" to="/update-teacher-summary">Изменить</v-btn>
+                    </v-row>
+                  </v-alert>
+                </v-card-text>
+              </v-card>
             </v-card-text>
           </v-card>
         </section>
         <!-- Секция: Мои уроки -->
         <section>
-          <h2
-            class="text-h5 font-weight-medium mb-4 d-flex align-center text-grey-darken-3"
-          >
+          <h2 class="text-h5 font-weight-medium mb-4 d-flex align-center text-grey-darken-3">
             <v-icon start color="primary">mdi-account-child-outline</v-icon>
             Предстоящие занятия
           </h2>
           <v-card flat color="transparent">
             <v-card-text class="pa-0">
-              <v-alert
-                type="info"
-                variant="tonal"
-                density="compact"
-                icon="mdi-information-outline"
-              >
+              <v-alert type="info" variant="tonal" density="compact" icon="mdi-information-outline">
                 Уроки не добавлены
-                <v-btn
-                  variant="text"
-                  size="small"
-                  color="primary"
-                  to="/student-registration"
-                  class="ml-2"
-                  >Добавить</v-btn
-                >
+                <v-btn variant="text" size="small" color="primary" to="/student-registration"
+                  class="ml-2">Добавить</v-btn>
               </v-alert>
             </v-card-text>
           </v-card>
         </section>
       </v-container>
 
-      <v-container
-        v-else
-        class="d-flex flex-column align-center justify-center fill-height"
-      >
-        <v-progress-circular
-          indeterminate
-          color="primary"
-          size="64"
-          width="6"
-          class="mb-4"
-        ></v-progress-circular>
+      <v-container v-else class="d-flex flex-column align-center justify-center fill-height">
+        <v-progress-circular indeterminate color="primary" size="64" width="6" class="mb-4"></v-progress-circular>
         <p class="text-subtitle-1 text-grey-darken-2 mb-4">
           Загрузка данных пользователя...
         </p>
-        <v-alert
-          v-if="!user"
-          type="warning"
-          variant="tonal"
-          width="100%"
-          max-width="400px"
-        >
+        <v-alert v-if="!user" type="warning" variant="tonal" width="100%" max-width="400px">
           Не удалось загрузить данные или пользователь не аутентифицирован.
           <template v-slot:append>
-            <v-btn to="/login" color="primary" variant="flat" class="mt-2"
-              >Войти</v-btn
-            >
+            <v-btn to="/login" color="primary" variant="flat" class="mt-2">Войти</v-btn>
           </template>
         </v-alert>
       </v-container>
     </v-col>
   </v-row>
 </template>
-
