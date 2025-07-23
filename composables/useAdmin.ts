@@ -6,6 +6,7 @@ import type { User } from "~/types/user.interface";
 export function useAdmin() {
 
   let teachers = ref<User[]>([])
+  let students = ref<User[]>([])
 
   async function fetchAllTeachers() {
     let res = await AdminApi.fetchAllTeachers();
@@ -33,10 +34,16 @@ export function useAdmin() {
     return res
   }
 
+  async function fetchStudents(email: string) {
+    let res = await AdminApi.fetchStudents(email);
+
+    students.value = res;
+  }
+
   return {
     // variables
-    teachers,
+    teachers, students,
     // functions
-    fetchTeachers, fetchAllTeachers, updateTeacherRights,
+    fetchTeachers, fetchAllTeachers, updateTeacherRights, fetchStudents,
   }
 }

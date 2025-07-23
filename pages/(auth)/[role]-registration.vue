@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import BackButton from '../../components/BackButton.vue'
 import { useField, useForm } from 'vee-validate'
 
+import { toast } from "vue3-toastify"
 import _ from 'lodash'
 
 const router = useRouter()
@@ -88,12 +89,32 @@ let loading = ref(false)
 const submit = handleSubmit(async values => {
   loading.value = true
   let mainRole = route.params?.role ?? "user";
-  let success = await auth.registration(Object.assign(values, {
-    roles: [mainRole],
-  }))
 
-  if (success) {
-    router.push(`/${mainRole}/me`);
+  if (mainRole == "student") {
+    if (!auth.user?._id) {
+      toast("Только Родитель может зарегистрировать Ребенка!", {
+        type: "error"
+      })
+      return;
+    }
+    let success = await auth.registration(Object.assign(values, {
+      roles: [mainRole],
+    }), auth.user._id)
+    if (success) {
+      toast("Успешная регистрация!", {
+        type: "success",
+        onClose: () => {
+          router.push("/parent/me");
+        }
+      })
+    }
+  } else {
+    let success = await auth.registration(Object.assign(values, {
+      roles: [mainRole],
+    }))
+    if (success) {
+      router.push(`/${mainRole}/me`);
+    }
   }
 
   loading.value = false

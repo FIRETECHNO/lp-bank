@@ -27,5 +27,12 @@ export default {
       method: 'POST',
       body: { teacherId, newRights }
     });
-  }
+  },
+  fetchStudents(email: string): Promise<User[]> {
+    const { $apiFetch } = useNuxtApp();
+    return $apiFetch<User[]>("/teacher/get-students", {
+      method: "POST",
+      body: { email }
+    })
+  },
 }

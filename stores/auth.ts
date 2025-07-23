@@ -16,13 +16,20 @@ export const useAuth = defineStore('auth', () => {
     return (user.value?.roles[0] ?? "user") as unknown as Role
   })
 
-  async function registration(data: any): Promise<boolean> {
+  async function registration(data: any, parentId?: string): Promise<boolean> {
     try {
-      const response = await AuthAPI.registration(data)
+      let response;
+      if (parentId) {
+        // Родитель регистрирует Ребенка
+        response = await AuthAPI.registration(data, parentId)
+      } else {
+        // обычная регистрация
+        response = await AuthAPI.registration(data)
+      }
 
       if (response.status.value != "success") return false;
 
-      if (response.data.value) {
+      if (response.data.value && !parentId) {
         user.value = response.data.value.user
       }
       return true

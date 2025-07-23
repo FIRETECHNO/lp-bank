@@ -1,8 +1,8 @@
 import type { User } from "~/types/user.interface"
 
 export default {
-  registration(user: any): Promise<any> {
-    return useApiFetch('/auth/registration', { method: 'POST', body: user })
+  registration(user: any, parentId?: string): Promise<any> {
+    return useApiFetch(`/auth/registration`, { method: 'POST', body: { user, parentId: parentId ?? null } })
   },
   registerStudent(user: any): Promise<any> {
     return useApiFetch('/auth/register-student', { method: 'POST', body: user })
