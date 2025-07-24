@@ -1,6 +1,6 @@
-// export interface Role {
-//   type: ;
-// }
+export interface Role {
+  type: "student" | "teacher" | "parent" | "admin" | "user";
+}
 
 export interface TeacherSummary {
   educationLevel: string;

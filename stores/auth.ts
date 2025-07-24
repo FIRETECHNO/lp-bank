@@ -10,10 +10,10 @@ import MatchApi from "~/api/MatchApi"
 export const useAuth = defineStore('auth', () => {
   let user = ref<User | null>()
 
-  let role = computed<Role>(() => {
-    if (user.value?.roles.includes("student" as unknown as Role)) return "student" as unknown as Role
-    if (user.value?.roles.includes("parent" as unknown as Role)) return "parent" as unknown as Role
-    return (user.value?.roles[0] ?? "user") as unknown as Role
+  let role = computed<string>(() => {
+    if (user.value?.roles.includes("student")) return "student"
+    if (user.value?.roles.includes("parent")) return "parent"
+    return user.value?.roles[0] ?? "user"
   })
 
   async function registration(data: any, parentId?: string): Promise<boolean> {
