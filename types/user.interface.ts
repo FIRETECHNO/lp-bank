@@ -1,3 +1,5 @@
+import type { Lesson } from "./lesson.interface";
+
 export interface Role {
   type: "student" | "teacher" | "parent" | "admin" | "user";
 }
@@ -18,9 +20,18 @@ export interface User {
   password: string;
   roles: ("student" | "teacher" | "parent" | "admin" | "user")[];
 
-  //Teacher info
+  // Teacher info
   educationLevel?: string;
   experience?: string;
   achievements?: string;
   aboutMe?: string;
+  rights: string[];
+
+  // Student info
+  parentId?: string
+
+  // Parent info
+  myChildren?: string[]
+
+  lessons: Lesson[] | string[]
 }

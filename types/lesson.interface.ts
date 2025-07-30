@@ -5,4 +5,6 @@ export interface Lesson extends EducationForm {
   student: string;
   dateTime: string;
   isFirstLesson: boolean;
+
+  _id?: string // from db
 }
