@@ -5,6 +5,7 @@ import type { User, Role } from "../types/user.interface"
 
 import { ref, computed } from "vue"
 import MatchApi from "~/api/MatchApi"
+import type { Lesson } from "~/types/lesson.interface"
 
 
 export const useAuth = defineStore('auth', () => {
@@ -15,6 +16,8 @@ export const useAuth = defineStore('auth', () => {
     if (user.value?.roles.includes("parent")) return "parent"
     return user.value?.roles[0] ?? "user"
   })
+
+  let lessons = ref<Lesson[]>([])
 
   async function registration(data: any, parentId?: string): Promise<boolean> {
     try {
@@ -180,12 +183,19 @@ export const useAuth = defineStore('auth', () => {
     return { success: false };
   }
 
+  async function getMyLessons() {
+    let { user, role } = useAuth()
+    if (!user?._id) return;
+
+    lessons.value = await AuthAPI.getMyLessons(user._id, role);
+  }
+
   return {
     // variables
-    user, role,
+    user, role, lessons,
     // functions
     registration, login, checkAuth, logout,
     updateUser, sendResetLink, resetPassword,
-    getAllUsers, uploadAvatar, Equals, updateAboutMe
+    getAllUsers, uploadAvatar, Equals, updateAboutMe, getMyLessons,
   }
 })

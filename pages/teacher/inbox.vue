@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: "teacher-cabinet"
+  layout: "teacher-cabinet",
+  middleware: ['teacher']
 })
 </script>
 <template>

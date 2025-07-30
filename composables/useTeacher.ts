@@ -1,10 +1,13 @@
 
 import TeacherApi from "~/api/TeacherApi";
+import type { Lesson } from "~/types/lesson.interface";
 // types
 import type { TeacherSummary } from "~/types/user.interface";
 
 export function useTeacher() {
-  async function updateTeacherSummary(summary: TeacherSummary):  Promise<{ success: boolean }> {
+  let lessons = ref<Lesson[]>([])
+
+  async function updateTeacherSummary(summary: TeacherSummary): Promise<{ success: boolean }> {
     let { user } = useAuth();
     if (!user?._id) return { success: false };
 
@@ -12,8 +15,11 @@ export function useTeacher() {
 
     return res;
   }
+
   return {
     // functions
     updateTeacherSummary,
+    // variables
+    lessons,
   }
 }

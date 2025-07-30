@@ -4,7 +4,8 @@ import type { User } from '~/types/user.interface';
 
 
 definePageMeta({
-  layout: "teacher-cabinet"
+  layout: "teacher-cabinet",
+  middleware: ['teacher']
 })
 
 const authStore = useAuth();

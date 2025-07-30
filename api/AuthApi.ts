@@ -1,3 +1,4 @@
+import type { Lesson } from "~/types/lesson.interface"
 import type { User } from "~/types/user.interface"
 
 export default {
@@ -46,4 +47,19 @@ export default {
       body: data,
     });
   },
+
+  getMyLessons(userId: string, role: string): Promise<Lesson[]> {
+    const { $apiFetch } = useNuxtApp();
+    return $apiFetch<Lesson[]>(`/user/get-lessons?role=${role}`, {
+      method: 'POST',
+      body: { userId },
+    });
+  },
+
+  getUserById(userId: string): Promise<User | null> {
+    const { $apiFetch } = useNuxtApp();
+    return $apiFetch<User | null>(`/user/get-by-id?_id=${userId}`, {
+      method: 'GET',
+    });
+  }
 }

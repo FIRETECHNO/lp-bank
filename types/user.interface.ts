@@ -33,5 +33,5 @@ export interface User {
   // Parent info
   myChildren?: string[]
 
-  lessons: Lesson[] | string[]
+  lessons: string[]
 }
