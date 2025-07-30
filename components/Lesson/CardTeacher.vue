@@ -34,7 +34,6 @@ const smartFormattedDateTime = computed(() => {
     <v-card-title class="d-flex justify-space-between align-center">
       <div>
         <p class="text-h6 text-primary">{{ smartFormattedDateTime }}</p>
-        <p class="text-subtitle-2 text-grey-darken-1">ID Учителя: {{ lesson.teacher }}</p>
       </div>
       <v-chip v-if="lesson.isFirstLesson" color="success" variant="flat" prepend-icon="mdi-star-circle-outline"
         text="Первый урок"></v-chip>
