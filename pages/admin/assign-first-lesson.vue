@@ -104,20 +104,17 @@ async function submit() {
         <v-col cols="12">
           <p class="text-h4 font-weight-bold">Выбор Репетитора</p>
         </v-col>
-        <v-col cols="10">
+        <v-col cols="11">
           <v-text-field placeholder="teacher@gmail.com" type="email" variant="outlined" hide-details
             v-model="teacherEmailToFind"></v-text-field>
         </v-col>
-        <v-col cols="2">
-          <v-btn @click="findTeachers" class="h-100">найти</v-btn>
+        <v-col cols="1">
+          <v-btn @click="findTeachers" block class="h-100">найти</v-btn>
         </v-col>
-        <v-col v-if="teachers.length > 0" v-for="(teacher, index) in teachers" :key="index" cols="6">
-          <v-card :color="teacher._id == selectedTeacherId ? 'success' : ''">
-            {{ teacher }}
-            <v-card-actions>
-              <v-btn @click="selectTeacher(teacher._id)">выбрать</v-btn>
-            </v-card-actions>
-          </v-card>
+        <v-col v-if="teachers.length > 0" v-for="(teacher, index) in teachers" :key="index" cols="4">
+          <UserCard :user="teacher" :color="teacher._id == selectedTeacherId ? 'success' : ''">
+            <v-btn @click="selectTeacher(teacher._id)">выбрать</v-btn>
+          </UserCard>
         </v-col>
         <v-col v-else cols="12" class="d-flex justify-center">
           Воспользуйтесь поиском
@@ -127,20 +124,17 @@ async function submit() {
         <v-col cols="12">
           <p class="text-h4 font-weight-bold">Выбор Обучающегося</p>
         </v-col>
-        <v-col cols="10">
+        <v-col cols="11">
           <v-text-field placeholder="teacher@gmail.com" type="email" variant="outlined" hide-details
             v-model="studentEmailToFind"></v-text-field>
         </v-col>
-        <v-col cols="2">
-          <v-btn @click="findStudents" class="h-100">найти</v-btn>
+        <v-col cols="1">
+          <v-btn @click="findStudents" block class="h-100">найти</v-btn>
         </v-col>
-        <v-col v-if="teachers.length > 0" v-for="(student, index) in students" :key="index" cols="6">
-          <v-card :color="student._id == selectedStudentId ? 'success' : ''">
-            {{ student }}
-            <v-card-actions>
-              <v-btn @click="selectStudent(student._id)">выбрать</v-btn>
-            </v-card-actions>
-          </v-card>
+        <v-col v-if="students.length > 0" v-for="(student, index) in students" :key="index" cols="4">
+          <UserCard :user="student" :color="student._id == selectedStudentId ? 'success' : ''">
+            <v-btn @click="selectStudent(student._id)">выбрать</v-btn>
+          </UserCard>
         </v-col>
         <v-col v-else cols="12" class="d-flex justify-center">
           Воспользуйтесь поиском
@@ -149,23 +143,26 @@ async function submit() {
 
       <v-dialog v-model="confirmLessonAssignmentDialog" width="auto" persistent>
         <v-card min-width="500">
+          <v-card-title>Назначить первый урок</v-card-title>
           <v-card-text>
-            <p class="text-h5 font-weight-bold">Репетитор</p>
-            {{ selectedTeacher }}
-
-            <p class="text-h5 font-weight-bold">Ученик</p>
-            {{ selectedStudent }}
-
-            <v-row>
+            <v-row class="d-flex justify-center">
+              <v-col cols="12" class="d-flex justify-center">
+                <div class="d-flex flex-column ma-3">
+                  <p class="text-h5 font-weight-bold">Репетитор</p>
+                  <UserCard :user="selectedTeacher" />
+                </div>
+                <div class="d-flex flex-column ma-3">
+                  <p class="text-h5 font-weight-bold">Ученик</p>
+                  <UserCard :user="selectedStudent" />
+                </div>
+              </v-col>
               <v-col cols="12" class="d-flex justify-center">
                 <TeacherTagsFilter @submit="handleTeacherFiltersUpdate" />
               </v-col>
 
-              <v-col cols="6">
+              <v-col cols="12" class="d-flex justify-center">
                 <v-date-picker v-model="lessonDate" show-adjacent-months header="Выберите дату"
                   landscape></v-date-picker>
-              </v-col>
-              <v-col cols="6">
                 <v-time-picker v-model="lessonTime" format="24hr"></v-time-picker>
               </v-col>
             </v-row>
