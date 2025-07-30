@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type { User } from '~/types/user.interface';
+import type { EducationForm } from '~/types/education-form.interface';
+import type { Lesson } from '~/types/lesson.interface';
+import { toast } from 'vue3-toastify';
 
 definePageMeta({
   middleware: ["admin"]
@@ -28,6 +31,10 @@ let selectedStudent = computed<User | null>(() => {
 })
 let confirmLessonAssignmentDialog = ref<boolean>(false)
 
+let teacherFilters = ref<EducationForm>();
+let lessonDate = ref<string>("")
+let lessonTime = ref<string>("")
+
 watch([selectedTeacherId, selectedStudentId], ([newTeacher, newStudent]) => {
   if (newTeacher != "" && newStudent != "") {
     confirmLessonAssignmentDialog.value = true;
@@ -48,6 +55,46 @@ function selectTeacher(teacherId: string) {
 
 function selectStudent(studentId: string) {
   selectedStudentId.value = studentId;
+}
+
+function handleTeacherFiltersUpdate(data: EducationForm) {
+  teacherFilters.value = data;
+}
+
+function closeDialog() {
+  confirmLessonAssignmentDialog.value = false;
+  selectedTeacherId.value = "";
+  selectedStudentId.value = "";
+}
+
+async function submit() {
+  if (!teacherFilters.value?.goals.length) return;
+  let hour = Number(lessonTime.value.split(":")[0])
+  let minute = Number(lessonTime.value.split(":")[1])
+
+  let dateTime = new Date(lessonDate.value)
+
+  dateTime.setHours(hour);
+  dateTime.setMinutes(minute);
+
+  let ISODateTime = dateTime.toISOString();
+
+  let toSend: Lesson = {
+    ...teacherFilters.value,
+    teacher: selectedTeacherId.value,
+    student: selectedStudentId.value,
+    dateTime: ISODateTime,
+    isFirstLesson: true,
+  }
+
+  let res = await adminStore.assignFirstLesson(toSend)
+  if (res.success) {
+    toast("Успешно!", {
+      type: "success",
+      autoClose: 600,
+      onClose: closeDialog
+    })
+  }
 }
 </script>
 <template>
@@ -111,14 +158,22 @@ function selectStudent(studentId: string) {
 
             <v-row>
               <v-col cols="12" class="d-flex justify-center">
-                <TeacherTagsFilter />
+                <TeacherTagsFilter @submit="handleTeacherFiltersUpdate" />
+              </v-col>
+
+              <v-col cols="6">
+                <v-date-picker v-model="lessonDate" show-adjacent-months header="Выберите дату"
+                  landscape></v-date-picker>
+              </v-col>
+              <v-col cols="6">
+                <v-time-picker v-model="lessonTime" format="24hr"></v-time-picker>
               </v-col>
             </v-row>
 
           </v-card-text>
           <v-card-actions>
-            <v-btn color="error">отмена</v-btn>
-            <v-btn color="success">подтвердить</v-btn>
+            <v-btn color="error" @click="closeDialog">отмена</v-btn>
+            <v-btn color="success" @click="submit">подтвердить</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

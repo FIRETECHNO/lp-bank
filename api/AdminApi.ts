@@ -1,3 +1,4 @@
+import type { Lesson } from "~/types/lesson.interface";
 import type { User } from "~/types/user.interface";
 
 export default {
@@ -35,4 +36,11 @@ export default {
       body: { email }
     })
   },
+  assignFirstLesson(lesson: Lesson): Promise<{ success: boolean }> {
+    const { $apiFetch } = useNuxtApp();
+    return $apiFetch<{ success: boolean }>("/lesson/assign", {
+      method: "POST",
+      body: { lesson }
+    })
+  }
 }

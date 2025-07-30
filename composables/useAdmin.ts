@@ -2,6 +2,7 @@
 import AdminApi from "~/api/AdminApi";
 // types
 import type { User } from "~/types/user.interface";
+import type { Lesson } from "~/types/lesson.interface";
 
 export function useAdmin() {
 
@@ -40,10 +41,15 @@ export function useAdmin() {
     students.value = res;
   }
 
+  async function assignFirstLesson(lessonData: Lesson): Promise<{ success: boolean }> {
+    let res = await AdminApi.assignFirstLesson(lessonData);
+    return res;
+  }
+
   return {
     // variables
     teachers, students,
     // functions
-    fetchTeachers, fetchAllTeachers, updateTeacherRights, fetchStudents,
+    fetchTeachers, fetchAllTeachers, updateTeacherRights, fetchStudents, assignFirstLesson,
   }
 }

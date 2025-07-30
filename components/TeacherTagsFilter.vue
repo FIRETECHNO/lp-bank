@@ -1,39 +1,13 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import type { EducationForm } from '~/types/education-form.interface';
 
-interface EducationForm {
-  subjects: string[];
-  grades: number[];
-  goals: string[];
-}
 
 const emit = defineEmits(['submit']);
 
 const stepperItems = ref(['Предметы', 'Классы', 'Цели', 'Сгенерировать']);
 
-const selectionOptions = ref({
-  subjects: [
-    { display: "Математика 📐", value: "Математика" },
-    { display: "Русский язык ✍️", value: "Русский язык" },
-    { display: "Физика ⚛️", value: "Физика" },
-    { display: "Химия 🧪", value: "Химия" },
-    { display: "Информатика 💻", value: "Информатика" },
-    { display: "История 🏛️", value: "История" },
-    { display: "Обществознание 🌍", value: "Обществознание" },
-  ],
-  grades: Array.from({ length: 11 }, (_, i) => ({
-    display: `${i + 1} класс`,
-    value: i + 1,
-  })),
-  goals: [
-    { display: "Повышение успеваемости 📈", value: "Повышение успеваемости" },
-    { display: "Подготовка к ОГЭ 🎓", value: "ОГЭ" },
-    { display: "Подготовка к ЕГЭ 🏅", value: "ЕГЭ" },
-    { display: "Подготовка к ВПР 📝", value: "ВПР" },
-    { display: "Подготовка к ДВИ 🏛️", value: "ДВИ" },
-    { display: "Подготовка к олимпиадам 🏆", value: "Олимпиады" },
-  ],
-});
+const { selectionOptions } = useLessonPurposeData();
 
 const formData = ref<EducationForm>({
   subjects: [],
@@ -44,7 +18,6 @@ const formData = ref<EducationForm>({
 const currentStep = ref<number>(1);
 
 function submit() {
-  console.log("Автоматическая отправка данных:", formData.value);
   emit("submit", formData.value);
 }
 
