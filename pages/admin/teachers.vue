@@ -1,9 +1,11 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: ["admin"],
+  layout: "admin-cabinet",
+})
+
 import { toast } from 'vue3-toastify';
 
-definePageMeta({
-  middleware: ["admin"]
-})
 let adminStore = useAdmin();
 
 let rightsDialog = ref<boolean>(false);

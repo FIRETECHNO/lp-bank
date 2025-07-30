@@ -1,12 +1,13 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: ["admin"],
+  layout: "admin-cabinet",
+})
 import type { User } from '~/types/user.interface';
 import type { EducationForm } from '~/types/education-form.interface';
 import type { Lesson } from '~/types/lesson.interface';
 import { toast } from 'vue3-toastify';
 
-definePageMeta({
-  middleware: ["admin"]
-})
 let adminStore = useAdmin();
 
 let teacherEmailToFind = ref<string>("")
