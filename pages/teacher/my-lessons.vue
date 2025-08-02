@@ -5,6 +5,7 @@ definePageMeta({
 })
 
 import AuthApi from '~/api/AuthApi';
+import type { Lesson } from '~/types/lesson.interface';
 import type { User } from '~/types/user.interface';
 
 const authStore = useAuth();
@@ -35,6 +36,15 @@ async function showStudentProfile(studentId: string) {
     isLoadingStudent.value = false;
   }
 }
+
+function updateLesson(lesson: Lesson) {
+  for (let l of lessons) {
+    if (l._id == lesson._id) {
+      Object.assign(l, lesson)
+      return;
+    }
+  }
+}
 </script>
 <template>
   <div>
@@ -46,7 +56,7 @@ async function showStudentProfile(studentId: string) {
           </v-col>
 
           <v-col cols="4" v-for="(lesson, index) of lessons" :key="index">
-            <LessonCardTeacher @view-student="showStudentProfile" :lesson="lesson" />
+            <LessonCardTeacher @view-student="showStudentProfile" @lesson-updated="updateLesson" :lesson="lesson" />
           </v-col>
         </v-row>
       </v-col>

@@ -1,4 +1,5 @@
 
+import LessonApi from "~/api/LessonApi";
 import TeacherApi from "~/api/TeacherApi";
 import type { Lesson } from "~/types/lesson.interface";
 // types
@@ -16,9 +17,13 @@ export function useTeacher() {
     return res;
   }
 
+  async function attachMiroBoard(lessonId: string, miroBoardUrl: string): Promise<Lesson> {
+    return await LessonApi.attachMiroBoard(lessonId, miroBoardUrl)
+  }
+
   return {
     // functions
-    updateTeacherSummary,
+    updateTeacherSummary, attachMiroBoard,
     // variables
     lessons,
   }
