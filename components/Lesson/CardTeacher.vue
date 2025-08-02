@@ -49,7 +49,7 @@ async function saveMiroUrl() {
     miroError.value = 'Пожалуйста, вставьте ссылку на доску Miro.';
     return;
   }
-  if (!miroUrlInput.value.startsWith('https://miro.com')) {
+  if (!miroUrlInput.value.startsWith('https://miro.com/app/live-embed/')) {
     miroError.value = 'Это не похоже на валидную ссылку на доску Miro.';
     return;
   }

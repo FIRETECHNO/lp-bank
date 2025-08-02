@@ -5,6 +5,16 @@ const lessonId = route.params._id as string;
 const lessonStore = useLesson();
 
 const { currentLesson } = lessonStore;
+
+
+definePageMeta({
+  middleware: [
+    "auth",
+    "lesson-access"
+  ]
+})
+
+
 const isLoading = ref(true);
 
 try {
