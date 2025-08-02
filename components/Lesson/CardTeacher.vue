@@ -68,6 +68,22 @@ async function saveMiroUrl() {
     isSavingMiroUrl.value = false;
   }
 }
+
+const isStartingLesson = ref(false);
+
+async function startLesson() {
+  if (!props.lesson?._id || props.lesson.isStarted) return;
+
+  isStartingLesson.value = true;
+  try {
+    const updatedLesson = await teacherStore.startLesson(props.lesson._id);
+    emit('lessonUpdated', updatedLesson);
+  } catch (error) {
+    console.error("Failed to start the lesson:", error);
+  } finally {
+    isStartingLesson.value = false;
+  }
+}
 </script>
 
 <template>
@@ -77,8 +93,12 @@ async function saveMiroUrl() {
       <v-card-title>
         <div class="d-flex justify-space-between align-center">
           <p class="text-h6 text-primary">{{ smartFormattedDateTime }}</p>
-          <v-chip v-if="lesson.isFirstLesson" color="success" variant="flat" prepend-icon="mdi-star-circle-outline"
-            text="Первый урок"></v-chip>
+          <div class="d-flex">
+            <v-chip v-if="lesson.isStarted" color="info" variant="flat" prepend-icon="mdi-play-circle" class="mr-2"
+              size="small" text="Урок идет"></v-chip>
+            <v-chip v-if="lesson.isFirstLesson" color="success" variant="flat" prepend-icon="mdi-star-circle-outline"
+              size="small" text="Первый урок"></v-chip>
+          </div>
         </div>
         <v-btn variant="text" @click="emit('viewStudent', lesson.student)">
           Профиль ученика
@@ -124,7 +144,16 @@ async function saveMiroUrl() {
           Доска Miro
         </v-btn>
         <v-spacer></v-spacer>
+        <v-btn v-if="!lesson.isStarted" color="success" variant="flat" prepend-icon="mdi-play"
+          :loading="isStartingLesson" @click="startLesson">
+          Начать урок
+        </v-btn>
 
+        <!-- LINK TO THE LESSON ROOM IF IT HAS STARTED -->
+        <v-btn v-else color="info" variant="flat" prepend-icon="mdi-arrow-right-bold-box-outline"
+          :to="`/lesson/${lesson._id}`">
+          Войти в урок
+        </v-btn>
       </v-card-actions>
     </v-card>
     <v-dialog v-model="isMiroDialogVisible" max-width="600px" persistent>

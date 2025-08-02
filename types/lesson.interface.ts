@@ -6,6 +6,7 @@ export interface Lesson extends EducationForm {
   dateTime: string;
   isFirstLesson: boolean;
   miroBoardUrl: string | null;
+  isStarted: boolean;
 
   _id?: string // from db
 }

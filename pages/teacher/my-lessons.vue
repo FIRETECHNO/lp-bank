@@ -37,9 +37,11 @@ async function showStudentProfile(studentId: string) {
   }
 }
 
-function updateLesson(lesson: Lesson) {
+function updateLesson(lesson: Lesson | null) {
+  if (!lesson) return;
+
   for (let l of lessons) {
-    if (l._id == lesson._id) {
+    if (l._id == lesson?._id) {
       Object.assign(l, lesson)
       return;
     }

@@ -76,6 +76,11 @@ const fullGoalsText = computed(() => getGoalsText(props.lesson.goals));
       <v-btn variant="text" @click="emit('viewTeacher', lesson.teacher)">
         Профиль преподавателя
       </v-btn>
+      <v-spacer></v-spacer>
+      <v-btn v-if="lesson.isStarted" color="success" variant="flat" prepend-icon="mdi-arrow-right-bold-box-outline"
+        :to="`/lesson/${lesson._id}`">
+        Войти в урок
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>

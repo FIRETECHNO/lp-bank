@@ -21,9 +21,16 @@ export function useTeacher() {
     return await LessonApi.attachMiroBoard(lessonId, miroBoardUrl)
   }
 
+  async function startLesson(lessonId: string): Promise<Lesson | null> {
+    const { user } = useAuth();
+    if (!user?._id) return null;
+
+    return await LessonApi.startLesson(lessonId, user?._id);
+  }
+
   return {
     // functions
-    updateTeacherSummary, attachMiroBoard,
+    updateTeacherSummary, attachMiroBoard, startLesson,
     // variables
     lessons,
   }

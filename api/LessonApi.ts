@@ -13,5 +13,11 @@ export default {
     return $apiFetch<Lesson | null>(`/lesson/get-by-id?_id=${lessonId}`, {
       method: 'GET',
     });
-  }
+  },
+  startLesson(lessonId: string, teacherId: string): Promise<Lesson | null> {
+    const { $apiFetch } = useNuxtApp();
+    return $apiFetch<Lesson | null>(`/lesson/start-lesson?lesson_id=${lessonId}&teacher_id=${teacherId}`, {
+      method: 'GET',
+    });
+  },
 }
