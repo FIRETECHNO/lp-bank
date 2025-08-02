@@ -33,7 +33,6 @@ const fullGoalsText = computed(() => getGoalsText(props.lesson.goals));
     </v-card-title>
 
     <v-card-subtitle class="d-flex justify-space-between align-center">
-      <span>Ваш преподаватель</span>
       <v-chip v-if="lesson.isFirstLesson" color="success" variant="flat" size="small"
         prepend-icon="mdi-star-circle-outline" text="Первый урок"></v-chip>
     </v-card-subtitle>
@@ -60,7 +59,7 @@ const fullGoalsText = computed(() => getGoalsText(props.lesson.goals));
 
         <v-list-item min-height="48" class="px-0">
           <template #prepend><v-icon class="mr-3">mdi-target</v-icon></template>
-          <div>
+          <div style="width: fit-content;">
             <v-tooltip location="top" activator="parent">
               <span>{{ fullGoalsText }}</span>
             </v-tooltip>
