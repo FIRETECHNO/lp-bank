@@ -26,8 +26,7 @@ const upcomingLessons = computed(() => {
     };
   }
 
-  const sortedFutureLessons = lessons.value
-    .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
+  const sortedFutureLessons = lessons.value; // they're already sorted
 
   if (sortedFutureLessons.length === 0) {
     return {
