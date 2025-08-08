@@ -10,10 +10,14 @@ export function useLesson() {
     currentLesson.value = await LessonApi.getLessonById(lessonId);
   }
 
+  async function finishLesson(lessonId: string): Promise<{ success: boolean }> {
+    return await LessonApi.finishLesson(lessonId)
+  }
+
   return {
     // variables
     currentLesson,
     // functions
-    getLessonById,
+    getLessonById, finishLesson,
   }
 }

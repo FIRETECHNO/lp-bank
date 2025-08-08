@@ -20,4 +20,10 @@ export default {
       method: 'GET',
     });
   },
+  finishLesson(lessonId: string): Promise<{ success: boolean }> {
+    const { $apiFetch } = useNuxtApp();
+    return $apiFetch<{ success: boolean }>(`/lesson/finish?lesson_id=${lessonId}`, {
+      method: 'GET',
+    });
+  }
 }

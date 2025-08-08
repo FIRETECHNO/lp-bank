@@ -1,4 +1,3 @@
-
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const lessonId = to.params._id as string;
 
@@ -6,6 +5,12 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const lessonStore = useLesson();
 
   try {
+    if (authStore.role === 'teacher') {
+      setPageLayout('teacher-lesson');
+    } else {
+      setPageLayout('default');
+    }
+
     await lessonStore.getLessonById(lessonId);
 
     const lesson = lessonStore.currentLesson.value;

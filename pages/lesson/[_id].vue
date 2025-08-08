@@ -11,9 +11,8 @@ definePageMeta({
   middleware: [
     "auth",
     "lesson-access"
-  ]
+  ],
 })
-
 
 const isLoading = ref(true);
 

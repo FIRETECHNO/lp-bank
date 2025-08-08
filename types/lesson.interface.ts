@@ -7,6 +7,7 @@ export interface Lesson extends EducationForm {
   isFirstLesson: boolean;
   miroBoardUrl: string | null;
   isStarted: boolean;
+  isFinished: boolean;
 
   _id?: string // from db
 }
