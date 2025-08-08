@@ -36,6 +36,9 @@ try {
 
       <v-divider class="my-4"></v-divider>
 
+      <iframe allow="camera;microphone;fullscreen;display-capture;autoplay"
+        :src="`https://edgeconf.ru/webinar/?roomId=${lessonId}`" style="width:100%; height:500px;"></iframe>
+
       <!-- Здесь происходит встраивание доски Miro -->
       <div v-if="currentLesson.miroBoardUrl">
         <h2 class="text-h5 mb-2">Интерактивная доска</h2>
