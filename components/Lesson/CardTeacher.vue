@@ -94,8 +94,12 @@ async function startLesson() {
         <div class="d-flex justify-space-between align-center">
           <p class="text-h6 text-primary">{{ smartFormattedDateTime }}</p>
           <div class="d-flex">
-            <v-chip v-if="lesson.isStarted" color="info" variant="flat" prepend-icon="mdi-play-circle" class="mr-2"
-              size="small" text="Урок идет"></v-chip>
+            <v-chip v-if="lesson.isFinished" color="error" variant="tonal" prepend-icon="mdi-close" class="ml-1 mr-1"
+              size="small" text="Урок окончен"></v-chip>
+            <v-chip v-if="lesson.isStarted && !lesson.isFinished" color="info" variant="flat"
+              prepend-icon="mdi-play-circle" class="ml-1 mr-1" size="small" text="Урок идет"></v-chip>
+
+
             <v-chip v-if="lesson.isFirstLesson" color="success" variant="flat" prepend-icon="mdi-star-circle-outline"
               size="small" text="Первый урок"></v-chip>
           </div>

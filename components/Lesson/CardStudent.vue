@@ -33,8 +33,14 @@ const fullGoalsText = computed(() => getGoalsText(props.lesson.goals));
     </v-card-title>
 
     <v-card-subtitle class="d-flex justify-space-between align-center">
-      <v-chip v-if="lesson.isFirstLesson" color="success" variant="flat" size="small"
-        prepend-icon="mdi-star-circle-outline" text="Первый урок"></v-chip>
+      <v-chip v-if="lesson.isFinished" color="error" variant="tonal" prepend-icon="mdi-close" class="ml-1 mr-1"
+        size="small" text="Урок окончен"></v-chip>
+      <v-chip v-if="lesson.isStarted && !lesson.isFinished" color="info" variant="flat" prepend-icon="mdi-play-circle"
+        class="ml-1 mr-1" size="small" text="Урок идет"></v-chip>
+
+
+      <v-chip v-if="lesson.isFirstLesson" color="success" variant="flat" prepend-icon="mdi-star-circle-outline"
+        size="small" text="Первый урок"></v-chip>
     </v-card-subtitle>
 
     <v-divider class="mt-2"></v-divider>

@@ -5,6 +5,8 @@ const lessonStore = useLesson();
 const route = useRoute();
 const lessonId = route.params._id as string;
 
+const { currentLesson } = lessonStore;
+
 const endDialog = ref(false);
 
 const summaryText = ref('');
@@ -52,10 +54,12 @@ async function submitSummary() {
 <template>
   <div>
     <v-container class="d-flex justify-end">
-      <v-btn color="error" variant="tonal" append-icon="mdi-close" @click="openEndDialog">
+      <v-btn v-if="!currentLesson?.isFinished" color="error" variant="tonal" prepend-icon="mdi-close"
+        @click="openEndDialog">
         закончить
       </v-btn>
     </v-container>
+
 
     <slot />
 

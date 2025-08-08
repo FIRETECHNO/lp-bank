@@ -5,12 +5,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const lessonStore = useLesson();
 
   try {
-    if (authStore.role === 'teacher') {
-      setPageLayout('teacher-lesson');
-    } else {
-      setPageLayout('default');
-    }
-
     await lessonStore.getLessonById(lessonId);
 
     const lesson = lessonStore.currentLesson.value;
@@ -18,6 +12,11 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     const hasAccess = authStore.user?._id === lesson?.student || authStore.user?._id === lesson?.teacher;
 
     if (hasAccess) {
+      if (authStore.role === 'teacher') {
+        setPageLayout('teacher-lesson');
+      } else {
+        setPageLayout('default');
+      }
       return true;
     } else {
       if (process.client) {
