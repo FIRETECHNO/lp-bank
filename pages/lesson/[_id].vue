@@ -37,7 +37,8 @@ try {
       <v-divider class="my-4"></v-divider>
 
       <iframe allow="camera;microphone;fullscreen;display-capture;autoplay"
-        :src="`https://edgeconf.ru/webinar/?roomId=${lessonId}`" style="width:100%; height:500px;"></iframe>
+        :src="`https://edgeconf.ru/call/?lang=ru&roomId=${lessonId}`"
+        style="width:100%; height:500px; border: 1px solid #ccc; border-radius: 8px;"></iframe>
 
       <!-- Здесь происходит встраивание доски Miro -->
       <div v-if="currentLesson.miroBoardUrl">
